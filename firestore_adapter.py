@@ -8,8 +8,11 @@ from date_utils import get_date_today
 # TODO: transactions!
 class FirestoreAdapter:
     def __init__(self):
-        cred = AnonymousCredentials()
         project_id = os.getenv('BUDBOT_PROJECT_ID')
+        if os.getenv('GOOGLE_APPLICATION_CREDENTIALS') is None:
+            cred = AnonymousCredentials()
+        else:
+            cred = None
         self.db = Client(project=project_id, credentials=cred)
         # self.date = str(datetime.date.today())[:-3]
 
