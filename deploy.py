@@ -15,6 +15,7 @@ class AppYaml:
                 '',
                 'env_variables:',
                 f'   DISCORD_BOT_TOKEN: "{self.token}"',
+                f'   BUDBOT_PROJECT_ID: "{os.getenv("BUDBOT_PROJECT_ID")}"',
                 '',
                 'automatic_scaling:',
                 '  min_instances: 1',

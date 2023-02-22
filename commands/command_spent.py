@@ -86,7 +86,7 @@ class SpentCommandExecutor:
             if spent:
                 summary = ''
                 for key, value in spent.items():
-                    summary += key + ': ' + value + ' EUR, '
+                    summary += f'{key}: {value} EUR, '
                 start = parameters['start_date']
                 end = parameters['end_date']
                 return f'SPENT {summary}period: {start} to {end}'
