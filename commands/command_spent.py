@@ -86,9 +86,9 @@ class SpentCommandExecutor:
             if spent:
                 summary = ''
                 for key, value in spent.items():
-                    summary += f'{key}: {value} EUR, '
+                    summary += f'{key}: {value} EUR\n'
                 start = parameters['start_date']
                 end = parameters['end_date']
-                return f'SPENT {summary}period: {start} to {end}'
+                return f'SPENT STATISTICS:\nperiod: {start} to {end}\n{summary}'
             return 'FAILED to calculate SPENT'
         raise InvalidParametersException

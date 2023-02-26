@@ -25,7 +25,8 @@ async def on_message(message):
     except commands.BotException as err:
         msg_back = str(err)
 
-    await message.channel.send(msg_back)
+    if msg_back:
+        await message.channel.send(msg_back)
 
 
 client.run(os.getenv('DISCORD_BOT_TOKEN'))

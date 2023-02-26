@@ -1,4 +1,5 @@
 import commands
+from typing import Optional
 
 
 class CommandsHandler:
@@ -11,13 +12,15 @@ class CommandsHandler:
         }
         self.database_adapter = database_adapter
 
-    def handle_message(self, msg: str) -> str:
-        msg = msg.split('\n')
-        command = msg[0]
+    def handle_message(self, msg: str) -> Optional[str]:
+        if msg.startswith('!'):
+            msg = msg.split('\n')
+            command = msg[0]
 
-        if command not in self.executors:
-            raise commands.InvalidCommandException(command, list(self.executors.keys()))
-        parameters = msg[1:]
-        return self.executors[command].execute(self.database_adapter, parameters)
+            if command not in self.executors:
+                raise commands.InvalidCommandException(command, list(self.executors.keys()))
+            parameters = msg[1:]
+            return self.executors[command].execute(self.database_adapter, parameters)
+        return None
 
 

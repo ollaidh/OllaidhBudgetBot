@@ -78,8 +78,20 @@ class TestSpent(unittest.TestCase):
 
         adapter.calculate_spent = MagicMock(return_value={'meat': '129', 'takeaway': '76'})
         self.assertEqual(
-            'SPENT meat: 129 EUR, takeaway: 76 EUR, period: 2022-12 to 2023-02',
+            'SPENT STATISTICS:\nperiod: 2022-12 to 2023-02\nmeat: 129 EUR\ntakeaway: 76 EUR\n',
             command.execute(adapter, ['2022-12', '2023-02', '$each'])
+        )
+
+        adapter.calculate_spent = MagicMock(return_value={'$all': '205'})
+        self.assertEqual(
+            'SPENT STATISTICS:\nperiod: 2022-12 to 2023-02\n$all: 205 EUR\n',
+            command.execute(adapter, ['2022-12', '2023-02', '$all'])
+        )
+
+        adapter.calculate_spent = MagicMock(return_value={'$home': '45'})
+        self.assertEqual(
+            'SPENT STATISTICS:\nperiod: 2022-12 to 2022-12\n$home: 45 EUR\n',
+            command.execute(adapter, ['2022-12', '$home'])
         )
 
         adapter.calculate_spent = MagicMock(return_value=None)
