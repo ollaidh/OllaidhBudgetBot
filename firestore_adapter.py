@@ -5,6 +5,7 @@ from google.cloud.firestore import Client
 from typing import Optional
 from date_utils import get_date_today
 
+
 # TODO: transactions!
 class FirestoreAdapter:
     def __init__(self):

@@ -7,7 +7,8 @@ def get_category(item: str) -> str:
         'takeaway': ('coffee', 'pasrty', 'breakfast', 'lunch', 'dinner', 'takeaway'),
         'utilities': ('electricity', 'water', 'internet'),
         'sweets': ('cookies', 'chocolate', 'sweets'),
-        'vegetables': ('potatoes', 'green', 'avocado', 'vegetables')
+        'vegetables': ('potatoes', 'green', 'avocado', 'vegetables'),
+        'dairy': ('milk', 'yogurt', 'cheese', 'dairy')
     }
     for category, items in categories.items():
         if item in items:
