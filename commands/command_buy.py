@@ -1,4 +1,5 @@
 from commands.exceptions import *
+from jibberjabber import JibberJabber
 
 
 def get_category(item: str) -> str:
@@ -32,12 +33,16 @@ def validate_buy_parameters(parameters: list[str]) -> (bool, list[str]):
 
 
 class BuyCommandExecutor:
+    def __init__(self):
+        self.jibjab = JibberJabber()
+
     def execute(self, database_adapter, user_input: list[str]) -> str:
         validated, parameters = validate_buy_parameters(user_input)
         if validated:
             buy = database_adapter.add_purchase(parameters[0], parameters[1], parameters[2])
             purchase = ' '.join(user_input)
+            comment = self.jibjab.toxic_response(parameters[0], parameters[2])
             if buy:
-                return f'ADDED PURCHASE: {purchase}'
+                return f'ADDED PURCHASE: {purchase}\n{comment}'
             return f'FAILED TO ADD {purchase} TO DATABASE'
         raise InvalidParametersException

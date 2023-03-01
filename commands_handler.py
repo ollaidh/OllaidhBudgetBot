@@ -20,7 +20,6 @@ class CommandsHandler:
             if command not in self.executors:
                 raise commands.InvalidCommandException(command, list(self.executors.keys()))
             parameters = msg[1:]
-            # parameters = msg[1].split()
             return self.executors[command].execute(self.database_adapter, parameters)
         return None
 
