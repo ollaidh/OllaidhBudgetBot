@@ -39,7 +39,7 @@ class JibberJabber:
 
     def choose_response(self, purchase: str, category: str) -> str:
         if purchase in self.responses_base and category in self.responses_base:
-            key = random.choice(list(self.responses_base.keys()))
+            key = random.choice([purchase, category])
             return random.choice(self.responses_base[key])
         elif purchase in self.responses_base:
             return random.choice(self.responses_base[purchase])

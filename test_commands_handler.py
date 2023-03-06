@@ -2,20 +2,33 @@ import unittest
 from commands_handler import *
 from commands.exceptions import *
 from unittest.mock import MagicMock
+from db_adapters.adapter import PurchaseInfo
 
 
 class TestCommandsHandler(unittest.TestCase):
     def test_handle_message(self):
         class TestAdapter:
+            def add_purchase(self, purchase: PurchaseInfo) -> bool:
+                return True
+
+            def delete_purchase(self) -> bool:
+                return True
+
+            def calculate_spent(self, start_date: str, end_date: str, category: str) -> Optional[dict]:
+                return {}
+
+        class TestJibberJabber:
             pass
 
         adapter = TestAdapter()
         handler = CommandsHandler(adapter)
 
         adapter.add_purchase = MagicMock(return_value=True)
-        self.assertEqual(handler.handle_message('!buy\ncoffee\n3.5'), 'ADDED PURCHASE: coffee 3.5')
-        self.assertEqual(handler.handle_message('!buy\ncoffee 3.5'), 'ADDED PURCHASE: coffee 3.5')
-        self.assertEqual(handler.handle_message('!buy coffee 3.5'), 'ADDED PURCHASE: coffee 3.5')
+
+        # *.startswith() is used to ignore random jibber jabber comments after th block ADDED PURCHASE
+        self.assertTrue(handler.handle_message('!buy\ncoffee\n3.5').startswith('ADDED PURCHASE: coffee 3.5'))
+        self.assertTrue(handler.handle_message('!buy\ncoffee 3.5').startswith('ADDED PURCHASE: coffee 3.5'))
+        self.assertTrue(handler.handle_message('!buy coffee 3.5').startswith('ADDED PURCHASE: coffee 3.5'))
 
         with self.assertRaises(InvalidCommandException) as ex:
             handler.handle_message('!purchased\ncoffee 3.5')

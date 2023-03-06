@@ -1,5 +1,6 @@
 from commands.exceptions import *
 from jibberjabber import JibberJabber
+from db_adapters.adapter import PurchaseInfo
 
 
 def get_category(item: str) -> str:
@@ -17,32 +18,31 @@ def get_category(item: str) -> str:
     return 'uncategorized'
 
 
-def validate_buy_parameters(parameters: list[str]) -> (bool, list[str]):
-    if len(parameters) < 2 or len(parameters) > 3:
-        return False, []
-    try:
-        price = float(parameters[1])
-        if price <= 0:
-            return False, []
-        if len(parameters) == 3:
-            return True, [parameters[0], parameters[1], parameters[2]]
-        category = get_category(parameters[0])
-        return True, [parameters[0], parameters[1], category]
-    except ValueError:
-        return False, []
 
 
 class BuyCommandExecutor:
     def __init__(self):
         self.jibjab = JibberJabber()
 
+    def validate(self, parameters: list[str]) -> PurchaseInfo:
+        if len(parameters) < 2 or len(parameters) > 3:
+            raise InvalidNumberParametersException
+        try:
+            price = float(parameters[1])
+            if price <= 0:
+                raise NegativePriceException
+            if len(parameters) == 3:
+                return PurchaseInfo(parameters[0], price, parameters[2])
+            category = get_category(parameters[0])
+            return PurchaseInfo(parameters[0], price, category)
+        except ValueError:
+            raise NotNumberPriceException
+
     def execute(self, database_adapter, user_input: list[str]) -> str:
-        validated, parameters = validate_buy_parameters(user_input)
-        if validated:
-            buy = database_adapter.add_purchase(parameters[0], parameters[1], parameters[2])
-            purchase = ' '.join(user_input)
-            comment = self.jibjab.toxic_response(parameters[0], parameters[2])
-            if buy:
-                return f'ADDED PURCHASE: {purchase}\n{comment}'
-            return f'FAILED TO ADD {purchase} TO DATABASE'
-        raise InvalidParametersException
+        parameters = self.validate(user_input)
+        buy = database_adapter.add_purchase(parameters.name, parameters.price, parameters.category)
+        purchase = f'{parameters.name} {parameters.price} {parameters.category}'
+        comment = self.jibjab.toxic_response(parameters.name, parameters.category)
+        if buy:
+            return f'ADDED PURCHASE: {purchase}\n{comment}'
+        return f'FAILED TO ADD {purchase} TO DATABASE'

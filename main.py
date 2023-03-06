@@ -2,7 +2,7 @@ import discord
 import os
 import commands
 import commands_handler
-from firestore_adapter import FirestoreAdapter
+from db_adapters.firestore_adapter import FirestoreAdapter
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)

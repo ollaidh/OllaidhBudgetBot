@@ -1,9 +1,10 @@
 import commands
 from typing import Optional
+from db_adapters.adapter import Adapter
 
 
 class CommandsHandler:
-    def __init__(self, database_adapter):
+    def __init__(self, database_adapter: Adapter):
         self.executors = {
             '!help': commands.HelpCommandExecutor(),
             '!buy': commands.BuyCommandExecutor(),

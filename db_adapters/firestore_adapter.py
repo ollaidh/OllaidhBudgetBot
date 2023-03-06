@@ -4,6 +4,8 @@ from google.auth.credentials import AnonymousCredentials
 from google.cloud.firestore import Client
 from typing import Optional
 from date_utils import get_date_today
+from date_utils import months_spent
+from db_adapters.adapter import PurchaseInfo
 
 
 # TODO: transactions!
@@ -17,7 +19,7 @@ class FirestoreAdapter:
         self.db = Client(project=project_id, credentials=cred)
         # self.date = str(datetime.date.today())[:-3]
 
-    def add_purchase(self, purchase: str, price: str, category: str):
+    def add_purchase(self, purchase: PurchaseInfo) -> bool:
         try:
             month_database = self.db.collection("months").document(get_date_today())
             data = month_database.get().to_dict()
@@ -33,9 +35,9 @@ class FirestoreAdapter:
             curr_purchase = self.db.collection("months").document(get_date_today()).collection("items").document(str(last_id))
             curr_purchase.set(
                 {
-                    "purchase": purchase,
-                    "price": price,
-                    "category": category,
+                    "purchase": purchase.name,
+                    "price": purchase.price,
+                    "category": purchase.category,
                     "date": get_date_today()
                 }
             )
@@ -44,7 +46,7 @@ class FirestoreAdapter:
             print(err)
             return False
 
-    def delete_purchase(self):
+    def delete_purchase(self) -> bool:
         try:
             last_id = self.db.collection("months").document(get_date_today()).get().to_dict()['last_id']
             if last_id:
@@ -54,21 +56,9 @@ class FirestoreAdapter:
         except:
             return False
 
-    def months_spent(self, start_date: str, end_date: str):
-        start_year = start_date[:4]
-        end_year = end_date[:4]
-        start_month = start_date[5:]
-        end_month = end_date[5:]
-        if end_year > start_year:
-            months = [start_year + '-' + str(i).zfill(2) for i in range(int(start_month), 13)] + [
-                end_year + '-' + str(i).zfill(2) for i in range(1, int(end_month) + 1)]
-        else:
-            months = [start_year + '-' + str(i).zfill(2) for i in range(int(start_month), int(end_month) + 1)]
-        return months
-
     def calculate_spent(self, start_date: str, end_date: str, category: str) -> Optional[dict]:
         try:
-            months = self.months_spent(start_date, end_date)
+            months = months_spent(start_date, end_date)
             spent = {}
             if category != "$each":
                 spent[category] = 0

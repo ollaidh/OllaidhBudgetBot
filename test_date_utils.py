@@ -1,5 +1,6 @@
 import unittest
 from date_utils import get_date_today
+from date_utils import months_spent
 from freezegun import freeze_time
 
 
@@ -13,6 +14,12 @@ class DateToday(unittest.TestCase):
 
         with freeze_time('1922-06-22'):
             self.assertEqual('1922-06', get_date_today())
+
+
+class MonthsSpent(unittest.TestCase):
+    def test_months_spent(self):
+        self.assertEqual(months_spent("2022-11", "2023-02"), ["2022-11", "2022-12", "2023-01", "2023-02"])
+        self.assertEqual(months_spent("2022-05", "2022-08"), ["2022-05", "2022-06", "2022-07", "2022-08"])
 
 
 if __name__ == '__main__':
