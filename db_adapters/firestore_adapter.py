@@ -59,24 +59,26 @@ class FirestoreAdapter:
     def calculate_spent(self, start_date: str, end_date: str, category: str) -> Optional[dict]:
         try:
             months = months_spent(start_date, end_date)
-            spent = {'$all': 0}
-            if category != "$each":
-                spent[category] = 0
+            spent = {}
+
+            def add_to_spent(cat, price):
+                spent[cat] = spent.get(cat, 0) + price
 
             for month in months:
                 items = self.db.collection("months").document(month).collection("items").get()
-                if items:
-                    for item in items:
-                        spent['$all'] += item.to_dict()["price"]
-                        if item.to_dict()["category"] == category:
-                            spent[category] += item.to_dict()["price"]
-                        if category == '$each':
-                            if item.to_dict()["category"] not in spent.keys():
-                                spent[item.to_dict()["category"]] = 0
-                            spent[item.to_dict()["category"]] += item.to_dict()["price"]
+                if not items:
+                    continue
+                for item in items:
+                    if category not in [item.to_dict()["category"], '$all', '$each']:
+                        continue
+                    if category == '$all':
+                        add_to_spent(category, item.to_dict()["price"])
+                    else:
+                        add_to_spent(item.to_dict()["category"], item.to_dict()["price"])
             return spent
         except:
             return None
+
 
 
 

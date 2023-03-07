@@ -90,12 +90,27 @@ class MyTestCase(unittest.TestCase):
         adapter.add_purchase(PurchaseInfo("muffin", 2, "takeaway"))
         date_mock.return_value = "2023-02"
         adapter.add_purchase(PurchaseInfo("pizza", 12.5, "takeaway"))
+
         spent_result = adapter.calculate_spent("2023-01", "2023-02", "takeaway")
-        self.assertEqual(spent_result, {"$all": 36.0, "takeaway": 14.5})
+        self.assertEqual(spent_result, {"takeaway": 14.5})
+
         spent_result = adapter.calculate_spent("2023-01", "2023-01", "$all")
         self.assertEqual(spent_result, {"$all": 23.5})
+
         spent_result = adapter.calculate_spent("2023-01", "2023-02", "$each")
-        self.assertEqual(spent_result, {"$all": 36.0, "takeaway": 14.5, "bread": 1.5, "dog": 20.0})
+        self.assertEqual(spent_result, {"takeaway": 14.5, "bread": 1.5, "dog": 20.0})
+
+        spent_result = adapter.calculate_spent("2028-01", "2029-02", "$each")
+        self.assertEqual(spent_result, {})
+
+        spent_result = adapter.calculate_spent("2028-01", "2029-02", "takeaway")
+        self.assertEqual(spent_result, {})
+
+        spent_result = adapter.calculate_spent("2028-01", "2029-02", "$all")
+        self.assertEqual(spent_result, {})
+
+        spent_result = adapter.calculate_spent("2023-01", "2023-02", "gagagagaga")
+        self.assertEqual(spent_result, {})
 
 
 if __name__ == '__main__':
