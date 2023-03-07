@@ -98,7 +98,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(spent_result, {"$all": 23.5})
 
         spent_result = adapter.calculate_spent("2023-01", "2023-02", "$each")
-        self.assertEqual(spent_result, {"takeaway": 14.5, "bread": 1.5, "dog": 20.0})
+        self.assertEqual(spent_result, {"TOTAL": 36.0, "takeaway": 14.5, "bread": 1.5, "dog": 20.0})
 
         spent_result = adapter.calculate_spent("2028-01", "2029-02", "$each")
         self.assertEqual(spent_result, {})

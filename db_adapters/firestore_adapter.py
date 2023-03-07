@@ -75,6 +75,11 @@ class FirestoreAdapter:
                         add_to_spent(category, item.to_dict()["price"])
                     else:
                         add_to_spent(item.to_dict()["category"], item.to_dict()["price"])
+            if category == '$each' and spent:
+                spent_total = 0
+                for key in spent:
+                    spent_total += spent[key]
+                spent['TOTAL'] = spent_total
             return spent
         except:
             return None

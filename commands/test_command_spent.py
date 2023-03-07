@@ -91,7 +91,13 @@ class TestSpent(unittest.TestCase):
         adapter.calculate_spent = MagicMock(return_value={'$home': '45'})
         self.assertEqual(
             'SPENT STATISTICS:\nperiod: 2022-12 to 2022-12\n$home: 45 EUR\n',
-            command.execute(adapter, ['2022-12', '$home'])
+            command.execute(adapter, ['2022-12', 'home'])
+        )
+
+        adapter.calculate_spent = MagicMock(return_value={})
+        self.assertEqual(
+            'FAILED to calculate SPENT',
+            command.execute(adapter, ['2100-12', 'robot_delivery'])
         )
 
         adapter.calculate_spent = MagicMock(return_value=None)
