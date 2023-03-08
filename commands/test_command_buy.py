@@ -44,7 +44,7 @@ class TestBuy(unittest.TestCase):
         adapter.add_purchase = MagicMock(return_value=True)
         self.assertTrue(command.execute(adapter, ['coffee', '2.5', 'takeout']).
                         startswith('ADDED PURCHASE: coffee 2.5 takeout'))
-        adapter.add_purchase.assert_called_once_with('coffee', 2.5, 'takeout')
+        adapter.add_purchase.assert_called_once_with(PurchaseInfo('coffee', 2.5, 'takeout'))
 
         adapter.add_purchase.reset_mock()
         adapter.add_purchase = MagicMock(return_value=False)
@@ -52,7 +52,7 @@ class TestBuy(unittest.TestCase):
             'FAILED TO ADD coffee 2.5 takeout TO DATABASE',
             command.execute(adapter, ['coffee', '2.5', 'takeout'])
         )
-        adapter.add_purchase.assert_called_once_with('coffee', 2.5, 'takeout')
+        adapter.add_purchase.assert_called_once_with(PurchaseInfo('coffee', 2.5, 'takeout'))
 
 
 if __name__ == '__main__':
