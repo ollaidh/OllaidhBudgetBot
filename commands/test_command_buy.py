@@ -42,17 +42,20 @@ class TestBuy(unittest.TestCase):
 
         adapter = TestAdapter()
         adapter.add_purchase = MagicMock(return_value=True)
-        self.assertTrue(command.execute(adapter, ['coffee', '2.5', 'takeout']).
+        self.assertTrue(command.execute(adapter, ['coffee', 2.5, 'takeout']).
                         startswith('ADDED PURCHASE: coffee 2.5 takeout'))
         adapter.add_purchase.assert_called_once_with(PurchaseInfo('coffee', 2.5, 'takeout'))
 
         adapter.add_purchase.reset_mock()
+
         adapter.add_purchase = MagicMock(return_value=False)
-        self.assertEqual(
-            'FAILED TO ADD coffee 2.5 takeout TO DATABASE',
-            command.execute(adapter, ['coffee', '2.5', 'takeout'])
+        self.assertRaisesRegex(
+            FailedAccessDatabaseException,
+            'No access to database. Failed to add purchase!',
+            command.execute,
+            adapter,
+            ['chicken', 8, 'meat']
         )
-        adapter.add_purchase.assert_called_once_with(PurchaseInfo('coffee', 2.5, 'takeout'))
 
 
 if __name__ == '__main__':

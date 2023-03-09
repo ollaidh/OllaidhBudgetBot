@@ -83,12 +83,14 @@ class SpentCommandExecutor:
                 parameters['end_date'],
                 parameters['category']
             )
+            start = parameters['start_date']
+            end = parameters['end_date']
             if spent:
                 summary = ''
                 for key, value in spent.items():
                     summary += f'{key}: {format(value, ".1f").rstrip("0").rstrip(".")} EUR\n'
-                start = parameters['start_date']
-                end = parameters['end_date']
                 return f'SPENT STATISTICS:\nperiod: {start} to {end}\n{summary}'
-            return 'FAILED to calculate SPENT'
+            elif spent == {}:
+                raise NoPurchacesThisParametersException
+            raise FailedAccessDatabaseException('calculate spent')
         raise InvalidParametersException

@@ -95,15 +95,21 @@ class TestSpent(unittest.TestCase):
         )
 
         adapter.calculate_spent = MagicMock(return_value={})
-        self.assertEqual(
-            'FAILED to calculate SPENT',
-            command.execute(adapter, ['2100-12', 'robot_delivery'])
+        self.assertRaisesRegex(
+            NoPurchacesThisParametersException,
+            'No purchases with these parameters.',
+            command.execute,
+            adapter,
+            ['2022-12', '2023-02', 'polar_bear']
         )
 
         adapter.calculate_spent = MagicMock(return_value=None)
-        self.assertEqual(
-            'FAILED to calculate SPENT',
-            command.execute(adapter, ['2022-12', '2023-02', '$each'])
+        self.assertRaisesRegex(
+            FailedAccessDatabaseException,
+            'No access to database. Failed to calculate spent!',
+            command.execute,
+            adapter,
+            ['2022-12', '2023-02', '$each']
         )
 
 

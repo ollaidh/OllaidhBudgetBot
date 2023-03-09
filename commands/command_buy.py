@@ -45,4 +45,4 @@ class BuyCommandExecutor:
         comment = self.jibjab.toxic_response(parameters.name, parameters.category)
         if buy:
             return f'ADDED PURCHASE: {purchase}\n{comment}'
-        return f'FAILED TO ADD {purchase} TO DATABASE'
+        raise FailedAccessDatabaseException('add purchase')
