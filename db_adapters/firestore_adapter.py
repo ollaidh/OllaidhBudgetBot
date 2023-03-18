@@ -73,14 +73,17 @@ class FirestoreAdapter:
                         continue
                     if category == '$all':
                         add_to_spent(category, item.to_dict()["price"])
-                    else:
+                    elif category == '$each':
                         add_to_spent(item.to_dict()["category"], item.to_dict()["price"])
+                    else:
+                        add_to_spent(item.to_dict()["category"].upper(), item.to_dict()["price"])
+                        add_to_spent(item.to_dict()["purchase"], item.to_dict()["price"])
             if category == '$each' and spent:
                 spent_total = 0
                 for key in spent:
                     spent_total += spent[key]
                 spent['TOTAL'] = spent_total
-            return spent
+            return {k: v for k, v in sorted(spent.items(), key=lambda x: - x[1])}
         except:
             return None
 
