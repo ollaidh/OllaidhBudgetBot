@@ -26,7 +26,10 @@ async def on_message(message):
         msg_back = str(err)
 
     if msg_back:
-        await message.channel.send(msg_back)
+        if os.path.isfile(msg_back):
+            await message.channel.send(file=discord.File(msg_back))
+        else:
+            await message.channel.send(msg_back)
 
 
 client.run(os.getenv('DISCORD_BOT_TOKEN'))

@@ -6,6 +6,7 @@ from typing import Optional
 from date_utils import get_date_today
 from date_utils import months_spent
 from db_adapters.adapter import PurchaseInfo
+from piechart_spent import piechart_maker
 
 
 # TODO: transactions!
@@ -69,11 +70,11 @@ class FirestoreAdapter:
                 if not items:
                     continue
                 for item in items:
-                    if category not in [item.to_dict()["category"], '$all', '$each']:
+                    if category not in [item.to_dict()["category"], '$all', '$each', '$chart']:
                         continue
                     if category == '$all':
                         add_to_spent(category, item.to_dict()["price"])
-                    elif category == '$each':
+                    elif category == '$each' or category == '$chart':
                         add_to_spent(item.to_dict()["category"], item.to_dict()["price"])
                     else:
                         add_to_spent(item.to_dict()["category"].upper(), item.to_dict()["price"])
@@ -83,7 +84,10 @@ class FirestoreAdapter:
                 for key in spent:
                     spent_total += spent[key]
                 spent['TOTAL'] = spent_total
-            return {k: v for k, v in sorted(spent.items(), key=lambda x: - x[1])}
+            result = {k: v for k, v in sorted(spent.items(), key=lambda x: - x[1])}
+            if category == '$chart' and spent:
+                result['CHART_PATH'] = piechart_maker(spent, start_date, end_date)
+            return result
         except:
             return None
 

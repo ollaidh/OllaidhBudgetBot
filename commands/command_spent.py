@@ -88,7 +88,7 @@ class SpentCommandExecutor:
             if spent:
                 summary = ''
                 for key, value in spent.items():
-                    summary += f'{key}: {format(value, ".1f").rstrip("0").rstrip(".")} EUR\n'
+                    summary += f'{key}: {format(value, ".1f").rstrip("0").rstrip(".")} {chr(8364)}\n'
                 return f'SPENT STATISTICS:\nperiod: {start} to {end}\n{summary}'
             elif spent == {}:
                 raise NoPurchacesThisParametersException

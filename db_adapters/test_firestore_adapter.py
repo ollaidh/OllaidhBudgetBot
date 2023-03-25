@@ -3,6 +3,8 @@ import unittest
 
 import requests
 
+import pathlib
+
 from db_adapters.firestore_adapter import FirestoreAdapter
 from db_adapters.adapter import PurchaseInfo
 from unittest.mock import patch
@@ -81,7 +83,8 @@ class MyTestCase(unittest.TestCase):
         })
 
     @patch('db_adapters.firestore_adapter.get_date_today')
-    def test_spent(self, date_mock):
+    @patch('piechart_spent.piechart_maker')
+    def test_spent(self, path_mock, date_mock):
         adapter = FirestoreAdapter()
         date_mock.return_value = "2023-01"
         adapter.add_purchase(PurchaseInfo("proplan", 20, "dog"))
@@ -113,6 +116,11 @@ class MyTestCase(unittest.TestCase):
 
         spent_result = adapter.calculate_spent("2023-01", "2023-02", "gagagagaga")
         self.assertEqual(spent_result, {})
+
+        path_mock.return_value = r"C:\Users\razer\PycharmProjects\budget_bot\spent.png"
+        spent_result = adapter.calculate_spent("2023-01", "2023-02", "$chart")
+        self.assertIsInstance(spent_result, dict)
+        self.assertEqual(list(spent_result.items()), [("dog", 20), ("takeaway", 14.5), ("bread", 1.5), ("CHART_PATH", r"C:\Users\razer\PycharmProjects\budget_bot\spent.png")])
 
 
 if __name__ == '__main__':
