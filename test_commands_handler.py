@@ -26,9 +26,9 @@ class TestCommandsHandler(unittest.TestCase):
         adapter.add_purchase = MagicMock(return_value=True)
 
         # *.startswith() is used to ignore random jibber jabber comments after th block ADDED PURCHASE
-        self.assertTrue(handler.handle_message('!buy\ncoffee\n3.5').startswith('ADDED PURCHASE: coffee 3.5'))
-        self.assertTrue(handler.handle_message('!buy\ncoffee 3.5').startswith('ADDED PURCHASE: coffee 3.5'))
-        self.assertTrue(handler.handle_message('!buy coffee 3.5').startswith('ADDED PURCHASE: coffee 3.5'))
+        self.assertTrue(handler.handle_message('!buy\ncoffee\n3.5')['message'].startswith('ADDED PURCHASE: coffee 3.5'))
+        self.assertTrue(handler.handle_message('!buy\ncoffee 3.5')['message'].startswith('ADDED PURCHASE: coffee 3.5'))
+        self.assertTrue(handler.handle_message('!buy coffee 3.5')['message'].startswith('ADDED PURCHASE: coffee 3.5'))
 
         with self.assertRaises(InvalidCommandException) as ex:
             handler.handle_message('!purchased\ncoffee 3.5')

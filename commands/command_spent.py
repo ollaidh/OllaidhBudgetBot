@@ -75,7 +75,7 @@ class SpentCommandExecutor:
             return None
         return self.validators[len(parameters)](parameters, spent_parameters)
 
-    def execute(self, database_adapter, user_input: list[str]) -> str:
+    def execute(self, database_adapter, user_input: list[str]) -> dict:
         parameters = self.validate(user_input)
         if parameters:
             spent = database_adapter.calculate_spent(
@@ -89,7 +89,7 @@ class SpentCommandExecutor:
                 summary = ''
                 for key, value in spent.items():
                     summary += f'{key}: {format(value, ".1f").rstrip("0").rstrip(".")} {chr(8364)}\n'
-                return f'SPENT STATISTICS:\nperiod: {start} to {end}\n{summary}'
+                return {'message': f'SPENT STATISTICS:\nperiod: {start} to {end}\n{summary}'}
             elif spent == {}:
                 raise NoPurchacesThisParametersException
             raise FailedAccessDatabaseException('calculate spent')

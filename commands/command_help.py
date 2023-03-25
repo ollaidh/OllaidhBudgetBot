@@ -11,7 +11,7 @@ def validate_help_parameters(parameters) -> bool:
 
 
 class HelpCommandExecutor:
-    def execute(self, database_adapter, parameters: list[str]) -> str:
+    def execute(self, database_adapter, parameters: list[str]) -> dict:
         help_info = {
             None: 'Ollaidh BUDget BUDdy - track your budget.\nCommands: buy, del, spent\nTo get info on each command, '
                   'type "!help %command_name%"',
@@ -35,7 +35,7 @@ class HelpCommandExecutor:
                      'Example:\n!spent 2022'
         }
         if not parameters:
-            return help_info[None]
+            return {'message': help_info[None]}
         if validate_help_parameters(parameters):
-            return help_info[parameters[0]]
+            return {'message': help_info[parameters[0]]}
         raise InvalidParametersException

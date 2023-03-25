@@ -38,11 +38,11 @@ class BuyCommandExecutor:
         except ValueError:
             raise NotNumberPriceException
 
-    def execute(self, database_adapter, user_input: list[str]) -> str:
+    def execute(self, database_adapter, user_input: list[str]) -> dict:
         parameters = self.validate(user_input)
         buy = database_adapter.add_purchase(PurchaseInfo(parameters.name, parameters.price, parameters.category))
         purchase = f'{parameters.name} {parameters.price} {parameters.category}'
         comment = self.jibjab.toxic_response(parameters.name, parameters.category)
         if buy:
-            return f'ADDED PURCHASE: {purchase}\n{comment}'
+            return {'message': f'ADDED PURCHASE: {purchase}\n{comment}'}
         raise FailedAccessDatabaseException('add purchase')

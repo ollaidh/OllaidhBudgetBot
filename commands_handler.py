@@ -13,7 +13,7 @@ class CommandsHandler:
         }
         self.database_adapter = database_adapter
 
-    def handle_message(self, msg: str) -> Optional[str]:
+    def handle_message(self, msg: str) -> Optional[dict]:
         if msg.startswith('!'):
             msg = msg.split()
             command = msg[0]

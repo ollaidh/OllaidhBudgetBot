@@ -78,19 +78,19 @@ class TestSpent(unittest.TestCase):
 
         adapter.calculate_spent = MagicMock(return_value={'meat': 129.111111111, 'takeaway': 76.2})
         self.assertEqual(
-            f'SPENT STATISTICS:\nperiod: 2022-12 to 2023-02\nmeat: 129.1 {chr(8364)}\ntakeaway: 76.2 {chr(8364)}\n',
+            {'message': f'SPENT STATISTICS:\nperiod: 2022-12 to 2023-02\nmeat: 129.1 {chr(8364)}\ntakeaway: 76.2 {chr(8364)}\n'},
             command.execute(adapter, ['2022-12', '2023-02', '$each'])
         )
 
         adapter.calculate_spent = MagicMock(return_value={'$all': 205})
         self.assertEqual(
-            f'SPENT STATISTICS:\nperiod: 2022-12 to 2023-02\n$all: 205 {chr(8364)}\n',
+            {'message': f'SPENT STATISTICS:\nperiod: 2022-12 to 2023-02\n$all: 205 {chr(8364)}\n'},
             command.execute(adapter, ['2022-12', '2023-02', '$all'])
         )
 
         adapter.calculate_spent = MagicMock(return_value={'HOME': 45, 'basket': 10, 'plates': 35})
         self.assertEqual(
-            f'SPENT STATISTICS:\nperiod: 2022-12 to 2022-12\nHOME: 45 {chr(8364)}\nbasket: 10 {chr(8364)}\nplates: 35 {chr(8364)}\n',
+            {'message': f'SPENT STATISTICS:\nperiod: 2022-12 to 2022-12\nHOME: 45 {chr(8364)}\nbasket: 10 {chr(8364)}\nplates: 35 {chr(8364)}\n'},
             command.execute(adapter, ['2022-12', 'home'])
         )
 

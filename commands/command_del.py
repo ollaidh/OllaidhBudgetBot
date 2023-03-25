@@ -7,10 +7,10 @@ class DelCommandExecutor:
             return True
         return False
 
-    def execute(self, database_adapter, parameters: list[str]) -> str:
+    def execute(self, database_adapter, parameters: list[str]) -> dict:
         if self.validate(parameters):
             deleted = database_adapter.delete_purchase()
             if deleted:
-                return 'DELETED: Last purchase'
-            return 'FAILED to delete last purchase from database'
+                return {'message': 'DELETED: Last purchase'}
+            return {'message': 'FAILED to delete last purchase from database'}
         raise InvalidParametersException

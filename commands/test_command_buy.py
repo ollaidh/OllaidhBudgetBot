@@ -42,8 +42,8 @@ class TestBuy(unittest.TestCase):
 
         adapter = TestAdapter()
         adapter.add_purchase = MagicMock(return_value=True)
-        self.assertTrue(command.execute(adapter, ['coffee', 2.5, 'takeout']).
-                        startswith('ADDED PURCHASE: coffee 2.5 takeout'))
+        result = command.execute(adapter, ['coffee', 2.5, 'takeout'])
+        self.assertTrue(result['message'].startswith('ADDED PURCHASE: coffee 2.5 takeout'))
         adapter.add_purchase.assert_called_once_with(PurchaseInfo('coffee', 2.5, 'takeout'))
 
         adapter.add_purchase.reset_mock()

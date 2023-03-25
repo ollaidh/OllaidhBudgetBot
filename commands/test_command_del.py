@@ -13,13 +13,13 @@ class TestDel(unittest.TestCase):
         adapter = TestAdapter()
         adapter.delete_purchase = MagicMock(return_value=True)
         self.assertEqual(
-            'DELETED: Last purchase',
+            {'message': 'DELETED: Last purchase'},
             command.execute(adapter, [])
         )
 
         adapter.delete_purchase = MagicMock(return_value=False)
         self.assertEqual(
-            'FAILED to delete last purchase from database',
+            {'message': 'FAILED to delete last purchase from database'},
             command.execute(adapter, [])
         )
 
