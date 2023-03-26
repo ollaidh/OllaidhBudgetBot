@@ -22,14 +22,13 @@ async def on_message(message):
 
     try:
         msg_back = handler.handle_message(message.content)
+        if 'message' in msg_back:
+            await message.channel.send(msg_back['message'])
+        elif 'chart_path' in msg_back:
+            await message.channel.send(file=discord.File(msg_back['chart_path']))
     except commands.BotException as err:
         msg_back = str(err)
-
-    if msg_back:
-        if os.path.isfile(msg_back):
-            await message.channel.send(file=discord.File(msg_back))
-        else:
-            await message.channel.send(msg_back)
+        await message.channel.send(msg_back)
 
 
 client.run(os.getenv('DISCORD_BOT_TOKEN'))

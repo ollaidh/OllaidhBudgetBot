@@ -9,7 +9,8 @@ class CommandsHandler:
             '!help': commands.HelpCommandExecutor(),
             '!buy': commands.BuyCommandExecutor(),
             '!del': commands.DelCommandExecutor(),
-            '!spent': commands.SpentCommandExecutor()
+            '!spent': commands.SpentCommandExecutor(),
+            '!chart': commands.ChartCommandExecutor(),
         }
         self.database_adapter = database_adapter
 
