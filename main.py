@@ -24,8 +24,10 @@ async def on_message(message):
         msg_back = handler.handle_message(message.content)
         if 'message' in msg_back:
             await message.channel.send(msg_back['message'])
-        elif 'chart_path' in msg_back:
-            await message.channel.send(file=discord.File(msg_back['chart_path']))
+        if 'chart_path' in msg_back:
+            msg_back['chart_path'].seek(0)
+            file = discord.File(msg_back['chart_path'], 'pie.png')
+            await message.channel.send(file=file)
     except commands.BotException as err:
         msg_back = str(err)
         await message.channel.send(msg_back)

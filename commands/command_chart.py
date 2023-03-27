@@ -3,6 +3,7 @@ import numpy as np
 import pathlib
 from commands import command_spent
 from commands.exceptions import *
+import io
 
 
 def piechart_maker(spent: dict, start_date: str, end_date: str) -> str:
@@ -19,7 +20,7 @@ def piechart_maker(spent: dict, start_date: str, end_date: str) -> str:
     values = [value for key, value in spent.items()]
     labels = list(spent.keys())
 
-    total_title = f"TOTAL: {sum(values)} {chr(8364)}  |  Period: {start_date} - {end_date}"
+    total_title = f"TOTAL: {format(sum(values), '.1f').rstrip('0').rstrip('.')} {chr(8364)}  |  Period: {start_date} - {end_date}."
 
     colors = plt.get_cmap('viridis')(np.linspace(0.5, 1.0, len(values)))
 
@@ -33,10 +34,12 @@ def piechart_maker(spent: dict, start_date: str, end_date: str) -> str:
 
     ax.set(xticks=(), yticks=())
 
-    piechart_path = pathlib.Path(__file__).parent.resolve() / 'spent.png'
-    plt.savefig(piechart_path, bbox_inches='tight', format='png')
+    # piechart_path = pathlib.Path(__file__).parent.resolve() / 'spent.png'
 
-    return str(piechart_path)
+    buf = io.BytesIO()
+    plt.savefig(buf, bbox_inches='tight', format='png')
+
+    return buf
 
 
 class ChartCommandExecutor:
