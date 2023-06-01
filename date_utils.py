@@ -1,14 +1,21 @@
 import datetime
 
 
+def get_month_today() -> str:
+    now = datetime.datetime.now()
+    year = str(now.year)
+    month = str(now.month).zfill(2)
+
+    month_today = f'{year}-{month}'
+
+    return month_today
+
+
 def get_date_today() -> str:
-    today = datetime.datetime.now()
-    year = str(today.year)
-    month = str(today.month).zfill(2)
+    now = datetime.datetime.now()
+    day_today = str(now).split()[0]
 
-    date_today = f'{year}-{month}'
-
-    return date_today
+    return day_today
 
 
 def months_spent(start_date: str, end_date: str):

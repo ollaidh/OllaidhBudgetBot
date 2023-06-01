@@ -18,15 +18,17 @@ class MyTestCase(unittest.TestCase):
         response = requests.delete(url)
         self.assertEqual(response.status_code, 200)
 
+    @patch('db_adapters.firestore_adapter.get_month_today')
     @patch('db_adapters.firestore_adapter.get_date_today')
-    def test_add_purchase(self, date_mock):
+    def test_add_purchase(self, date_mock, month_mock):
         adapter = FirestoreAdapter()
 
-        date_mock.return_value = "2022-10"
+        month_mock.return_value = "2022-10"
+        date_mock.return_value = "2022-10-04"
         success = adapter.add_purchase(PurchaseInfo("coffee", 3, "takeaway"))
         self.assertTrue(success)
 
-        purch1 = adapter.db.collection("months").document(date_mock()).collection("items").document(
+        purch1 = adapter.db.collection("months").document(month_mock()).collection("items").document(
             "0").get().to_dict()
         self.assertEqual(
             {
@@ -38,11 +40,12 @@ class MyTestCase(unittest.TestCase):
             purch1
         )
 
-        date_mock.return_value = "2022-12"
+        month_mock.return_value = "2022-12"
+        date_mock.return_value = "2022-12-31"
         success = adapter.add_purchase(PurchaseInfo("bulka", 4, "bread"))
         self.assertTrue(success)
 
-        purch2 = adapter.db.collection("months").document(date_mock()).collection("items").document(
+        purch2 = adapter.db.collection("months").document(month_mock()).collection("items").document(
             "0").get().to_dict()
         self.assertEqual(purch2, {
             "purchase": "bulka",
@@ -53,7 +56,7 @@ class MyTestCase(unittest.TestCase):
 
         success = adapter.add_purchase(PurchaseInfo("poop bag", 1, "dog"))
         self.assertTrue(success)
-        purch3 = adapter.db.collection("months").document(date_mock()).collection("items").document(
+        purch3 = adapter.db.collection("months").document(month_mock()).collection("items").document(
             "1").get().to_dict()
         self.assertEqual(purch3, {
             "purchase": "poop bag",
@@ -62,27 +65,29 @@ class MyTestCase(unittest.TestCase):
             "date": date_mock()
         })
 
+    @patch('db_adapters.firestore_adapter.get_month_today')
     @patch('db_adapters.firestore_adapter.get_date_today')
-    def test_delete_purchase(self, date_mock):
+    def test_delete_purchase(self, date_mock, month_mock):
         adapter = FirestoreAdapter()
-        date_mock.return_value = "2022-12"
+        month_mock.return_value = "2022-12"
+        date_mock.return_value = "2022-12-31"
         adapter.add_purchase(PurchaseInfo("bulka", 4, "bread"))
         adapter.add_purchase(PurchaseInfo("croissant", 3, "takeaway"))
         success = adapter.delete_purchase()
         self.assertTrue(success)
-        deleted_purchase = adapter.db.collection("months").document(date_mock()).collection("items").document(
+        deleted_purchase = adapter.db.collection("months").document(month_mock()).collection("items").document(
             "1").get()
         self.assertFalse(deleted_purchase.exists)
-        last_purchase = adapter.db.collection("months").document(date_mock()).collection("items").document(
+        last_purchase = adapter.db.collection("months").document(month_mock()).collection("items").document(
             "0").get().to_dict()
         self.assertEqual(last_purchase, {
             "purchase": "bulka",
             "price": 4,
             "category": "bread",
-            "date": "2022-12"
+            "date": date_mock()
         })
 
-    @patch('db_adapters.firestore_adapter.get_date_today')
+    @patch('db_adapters.firestore_adapter.get_month_today')
     def test_spent(self, date_mock):
         adapter = FirestoreAdapter()
         date_mock.return_value = "2023-01"

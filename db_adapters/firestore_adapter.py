@@ -3,10 +3,8 @@ import os
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.firestore import Client
 from typing import Optional
-from date_utils import get_date_today
-from date_utils import months_spent
+from date_utils import *
 from db_adapters.adapter import PurchaseInfo
-from piechart_spent import piechart_maker
 
 
 # TODO: transactions!
@@ -22,7 +20,7 @@ class FirestoreAdapter:
 
     def add_purchase(self, purchase: PurchaseInfo) -> bool:
         try:
-            month_database = self.db.collection("months").document(get_date_today())
+            month_database = self.db.collection("months").document(get_month_today())
             data = month_database.get().to_dict()
             if data:
                 last_id = int(data['last_id'])
@@ -31,9 +29,9 @@ class FirestoreAdapter:
                 month_database.set({'last_id': "0"})
                 last_id = 0
 
-            self.db.collection("months").document(get_date_today()).update({'last_id': str(last_id)})
+            self.db.collection("months").document(get_month_today()).update({'last_id': str(last_id)})
 
-            curr_purchase = self.db.collection("months").document(get_date_today()).collection("items").document(str(last_id))
+            curr_purchase = self.db.collection("months").document(get_month_today()).collection("items").document(str(last_id))
             curr_purchase.set(
                 {
                     "purchase": purchase.name,
@@ -49,10 +47,10 @@ class FirestoreAdapter:
 
     def delete_purchase(self) -> bool:
         try:
-            last_id = self.db.collection("months").document(get_date_today()).get().to_dict()['last_id']
+            last_id = self.db.collection("months").document(get_month_today()).get().to_dict()['last_id']
             if last_id:
-                self.db.collection("months").document(get_date_today()).collection('items').document(str(last_id)).delete()
-                self.db.collection("months").document(get_date_today()).update({'last_id': str(int(last_id) - 1)})
+                self.db.collection("months").document(get_month_today()).collection('items').document(str(last_id)).delete()
+                self.db.collection("months").document(get_month_today()).update({'last_id': str(int(last_id) - 1)})
             return True
         except:
             return False
