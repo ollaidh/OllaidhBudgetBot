@@ -4,7 +4,6 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 
-
 class TestChart(unittest.TestCase):
     @patch('commands.command_chart.piechart_maker')
     def test_command_execute(self, path_mock):

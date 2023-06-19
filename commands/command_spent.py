@@ -16,7 +16,7 @@ def get_date(line: str) -> Optional[str]:
 def validate_spent_param_len0(parameters: list[str], spent_parameters: dict) -> Optional[dict]:
     spent_parameters['start_date'] = get_date('today')
     spent_parameters['end_date'] = spent_parameters['start_date']
-    spent_parameters['category'] = '$all'
+    spent_parameters['category'] = '$each'
     return spent_parameters
 
 
