@@ -105,9 +105,9 @@ class MyTestCase(unittest.TestCase):
         spent_result = adapter.calculate_spent("2023-01", "2023-01", "$all")
         self.assertEqual(spent_result, {"$all": 23.5})
 
-        spent_result = adapter.calculate_spent("2023-01", "2023-02", "")
+        spent_result = adapter.calculate_spent("2023-01", "2023-02", "$each")
         self.assertIsInstance(spent_result, dict)
-        self.assertEqual(list(spent_result.items()), [("TOTAL", 36.0), ("dog", 20), ("takeaway", 14.5), ("bread", 1.5)])
+        self.assertEqual([("TOTAL", 36.0), ("dog", 20), ("takeaway", 14.5), ("bread", 1.5)], list(spent_result.items()))
 
         spent_result = adapter.calculate_spent("2028-01", "2029-02", "")
         self.assertEqual(spent_result, {})

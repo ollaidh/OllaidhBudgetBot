@@ -18,8 +18,6 @@ def get_category(item: str) -> str:
     return 'uncategorized'
 
 
-
-
 class BuyCommandExecutor:
     def __init__(self):
         self.jibjab = JibberJabber()

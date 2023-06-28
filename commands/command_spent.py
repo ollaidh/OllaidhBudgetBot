@@ -24,7 +24,7 @@ def validate_spent_param_len1(parameters: list[str], spent_parameters: dict) -> 
     if get_date(parameters[0]):
         spent_parameters['start_date'] = get_date(parameters[0])
         spent_parameters['end_date'] = spent_parameters['start_date']
-        spent_parameters['category'] = '$all'
+        spent_parameters['category'] = '$each'
     else:
         spent_parameters['start_date'] = get_date('today')
         spent_parameters['end_date'] = spent_parameters['start_date']
@@ -36,7 +36,7 @@ def validate_spent_param_len2(parameters: list[str], spent_parameters: dict) -> 
     if get_date(parameters[0]) and get_date(parameters[1]) and (get_date(parameters[0]) <= get_date(parameters[1])):
         spent_parameters['start_date'] = get_date(parameters[0])
         spent_parameters['end_date'] = get_date(parameters[1])
-        spent_parameters['category'] = '$all'
+        spent_parameters['category'] = '$each'
     else:
         if get_date(parameters[0]):
             spent_parameters['start_date'] = get_date(parameters[0])

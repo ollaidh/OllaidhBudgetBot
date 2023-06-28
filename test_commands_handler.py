@@ -38,6 +38,7 @@ class TestCommandsHandler(unittest.TestCase):
         self.assertTrue('!buy' in ex.exception.accepted_commands)
         self.assertTrue('!spent' in ex.exception.accepted_commands)
         self.assertTrue('!del' in ex.exception.accepted_commands)
+        self.assertTrue('!version' in ex.exception.accepted_commands)
 
         self.assertRaises(InvalidParametersException, handler.handle_message, '!spent\ncoffee 2012-01-01')
 

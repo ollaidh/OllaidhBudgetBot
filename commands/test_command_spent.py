@@ -24,7 +24,7 @@ class TestSpent(unittest.TestCase):
             {
                 'start_date': '2022-12',
                 'end_date': '2023-01',
-                'category': '$all'
+                'category': '$each'
             },
             executor.validate(['2022-12', '2023-01'])
         )
@@ -51,7 +51,7 @@ class TestSpent(unittest.TestCase):
             {
                 'start_date': '2022-12',
                 'end_date': '2022-12',
-                'category': '$all'
+                'category': '$each'
             },
             executor.validate(['2022-12'])
         )
@@ -60,7 +60,7 @@ class TestSpent(unittest.TestCase):
             {
                 'start_date': (str(datetime.today().date()))[:-3],
                 'end_date': (str(datetime.today().date()))[:-3],
-                'category': '$all'
+                'category': '$each'
             },
             executor.validate([]))
 

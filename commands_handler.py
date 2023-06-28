@@ -11,6 +11,7 @@ class CommandsHandler:
             '!del': commands.DelCommandExecutor(),
             '!spent': commands.SpentCommandExecutor(),
             '!chart': commands.ChartCommandExecutor(),
+            '!version': commands.VersionCommandExecutor()
         }
         self.database_adapter = database_adapter
 
