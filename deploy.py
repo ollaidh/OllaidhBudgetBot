@@ -18,15 +18,8 @@ class AppYaml:
                 f'   BUDBOT_PROJECT_ID: "{os.getenv("BUDBOT_PROJECT_ID")}"',
                 '',
                 'automatic_scaling:',
-                '  min_instances: 1',
                 '  max_instances: 1',
                 '',
-                'inbound_services:',
-                '- warmup',
-                '',
-                'handlers:',
-                '- url: /_ah/warmup',
-                '  script: warmup.py',
                 '',
                 'entrypoint: python3 main.py'
             ]
