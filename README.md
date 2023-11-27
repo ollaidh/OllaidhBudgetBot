@@ -1,115 +1,96 @@
 # BUDGET BOT
 
-This is a simple budget-tracking bot for Discord.
-Database is run on Google Cloud - Firestore database.
+This is a simple budget-tracking Discord bot written in Python
 You send a message to the bot with the purchase information
 (name, price, category), bot adds it to database. 
 Bot can return you simple statistics like money spent for certain period,
-product category, piechart of spent money etc.
+product category, pie-chart of spent money etc.
 
-## To start working
-???? Command line parameters (user, currency etc.)????
+Bot uses Google Cloud AppEngine and Firestore database.
 
-## Wake up the bot
-Go to `https://ollaidhbudbot.ew.r.appspot.com`
+## Example
 
-#TODO: check how it would be changed if bot is run on other's GCloud
-#TODO: now there is only collection "months" for my budget.How would it work if we add other users? Create a new collection for username? What about security?
+![Alt text](pics/example.png?raw=true "Title")
 
-## Commands:
-`!help` - 
+## Commands
 
-`!buy` - 
+`!buy` - adds purchase to database. Example: `!buy coffee 4.5 takeaway`. 
+First parameter is the name of the purchase, second parameter is its price,
+third parameter is a purchase category. Category can be left empty, in this
+case a predefined category will be set for this purchase or `uncategorized`
+if there's no predefined category. 
 
-`!del` - 
+Refer to `commands/command_buy` for the list of predefined categories.
 
-`!spent`- 
+Parameters can't contain spaces.
 
-`!chart` - 
+`!del` - Deletes the last purchase. Doesn't accept any parameters.
 
-`!version` - 
+`!spent`- Shows statistics about amount of money spent. Example:
+`!spent 2023-08 2023-12 takeaway` shows statistics from date 1 to date 2
+(inclusive) for the given category. If you don't specify a category, it
+will show you statistics across all categories: `!spent 2023-08 2023-12`.
+You can set one month to show statistics within one month: `!spent 2023-08`.
+Finally, you can just ask `!spent` for statistics on a current month across
+all categories.
 
+Note that date format should be `YYYY-MM`, no day is accepted.
 
-## Purchase
+`!chart` - Shows you a pie-chart statistics for a given request. Command
+parameters are the same as in `!spent`.
 
-### Purchase parameters:
-Each purchase has the following parameters:
+`!version` - Shows you a current bot version
 
-`name` - name of purchase *(steak, coffee, vegetables, books etc.)*
+`!help` - Displays help
 
-`price` - price in chosen currency *(30.5, 1230, 3.4 etc.)*
+## For developers
 
-`category` - category of the purchase *(food, transport, utilities etc.)*
-It is strongly recommended to stick to limited number of categories,
-otherwise statistics would be less representative. But it's always up to the user.
+Create and activate venv
 
-All purchase parameters are defined by the user.
-There is a limited number of pre-defined categories:
+Install requirements
 
-category *'meat'* : *'steak', 'pork', 'chicken', 'liver', 'bacon', 'meat'*
+### Local testing
 
-category *'takeaway'* : *'coffee', 'pasrty', 'breakfast', 'lunch', 'dinner', 'takeaway'*
+For local testing you need to install `gcloud sdk` https://cloud.google.com/sdk/docs/install
 
-category *'utilities'* : *'electricity', 'water', 'internet'*
+Install firestore emulator https://cloud.google.com/firestore/docs/emulator
 
-category *'sweets'* : *'cookies', 'chocolate', 'sweets'*
+You might need to install JDK
 
-category *'vegetables'* : *'potatoes', 'green', 'avocado', 'vegetables'*
+Login into your account with `gcloud auth login` (optional?)
 
-category *'dairy'* : *'milk', 'yogurt', 'cheese', 'dairy'*
+Run firestore emulator
 
-If you do not define category while adding a purchase, it will be 
-automatically defined for purchases with pre-defined categories.
-For purchases without pre-defined category the category will automatically be
-defined as *'uncategorized'*
+```
+cloud emulators firestore start --host-port localhost:8090
+```
 
-`date` - date making the purchase
+Set environment variables:
 
-### Add purchase:
-Send message with purchase information:
+`BUDBOT_PROJECT_ID` assign to your Google Cloud project ID
 
-`!buy %purchase_name% %price% %category%`
+`FIRESTORE_EMULATOR_HOST` assign according to your firestore
+emulator run command
 
-example:
+Database emulator state is automatically cleaned up before
+each test run, you don't need to restart emulator manually.
 
-`!buy coffee 2.5 takeaway`
+Run pytest tests
 
-Date of purchase is automatically detected as date of sending the message.
+```
+pytest .
+```
 
-### Delete purchase
+## Deploy
 
-Only last purchase can be deleted by sending a message to bot:
+Use `deploy.py` script for deploying bot to your Discord.
 
-`!del`
+Set the following environment variables:
 
-## Get statistics
-Spent money statistics can be provided for parameters set by user.
-Parameters are:
+`GOOGLE_APPLICATION_CREDENTIALS` pointing to a gcloud credentials
+file in bot folder. Don't commit this file!
 
-`Period of time` can come in three formats:
+`BUDBOT_PROJECT_ID` assign to your Google Cloud project ID
 
-- %start month% %end month% - for period of time from start month to end month including both
-- %month% - for provided month
-- no period - if no period provided, statistics come for current month
-
-`Category of products`
-If no category is provided, the total spent amount + spent for each category will be shown
-
-Examples:
-
-`!spent 2023-02 2023-05 takeaway`
-![Alt text](pics/spent1.png?raw=true "Title")
-
-### Get pie chart
-
-## Tests
-
-## Dependencies
-
-## Environmental variables
-
-## Repo structure
-
-## Prerequisites
-- Python 3.10
-
+`DISCORD_BOT_TOKEN` your Discord bot token. For more info about
+how to get a token refer to https://discord.com/developers/docs/topics/oauth2
