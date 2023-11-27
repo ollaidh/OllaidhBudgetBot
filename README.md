@@ -88,7 +88,13 @@ Use `deploy.py` script for deploying bot to your Discord.
 Set the following environment variables:
 
 `GOOGLE_APPLICATION_CREDENTIALS` pointing to a gcloud credentials
-file in bot folder. Don't commit this file!
+json file in bot folder. Don't commit this file! This repo is
+configured to ignore files with the `cred-*.json` mask, so you
+can name your cred files accordingly to avoid an accidental commit.
+
+To get a credentials json file, go to App Engine, Service accounts,
+choose an account, select Keys in a top menu, select Add key,
+Create new key, select json and download this file.
 
 `BUDBOT_PROJECT_ID` assign to your Google Cloud project ID
 
