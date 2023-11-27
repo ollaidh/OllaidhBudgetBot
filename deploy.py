@@ -16,6 +16,7 @@ class AppYaml:
                 'env_variables:',
                 f'   DISCORD_BOT_TOKEN: "{self.token}"',
                 f'   BUDBOT_PROJECT_ID: "{os.getenv("BUDBOT_PROJECT_ID")}"',
+                f'   GOOGLE_APPLICATION_CREDENTIALS: "{os.getenv("GOOGLE_APPLICATION_CREDENTIALS")}"',
                 '',
                 'automatic_scaling:',
                 '  max_instances: 1',

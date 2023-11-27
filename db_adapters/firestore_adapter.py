@@ -1,6 +1,5 @@
 import os
 
-from google.auth.credentials import AnonymousCredentials
 from google.cloud.firestore import Client
 from typing import Optional
 from date_utils import *
@@ -11,11 +10,7 @@ from db_adapters.adapter import PurchaseInfo
 class FirestoreAdapter:
     def __init__(self):
         project_id = os.getenv('BUDBOT_PROJECT_ID')
-        if os.getenv('GOOGLE_APPLICATION_CREDENTIALS') is None:
-            cred = AnonymousCredentials()
-        else:
-            cred = None
-        self.db = Client(project=project_id, credentials=cred)
+        self.db = Client(project=project_id)
         # self.date = str(datetime.date.today())[:-3]
 
     def add_purchase(self, purchase: PurchaseInfo) -> bool:
