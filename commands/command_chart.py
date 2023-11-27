@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import pathlib
 from commands import command_spent
 from commands.exceptions import *
 import io
 
 
-def piechart_maker(spent: dict, start_date: str, end_date: str) -> str:
+def piechart_maker(spent: dict, start_date: str, end_date: str) -> io.BytesIO:
     # formatting function to get value and percentage at the same time on pie chart:
     def autopct_format(numbers):
         def my_format(pct):
@@ -33,8 +32,6 @@ def piechart_maker(spent: dict, start_date: str, end_date: str) -> str:
            wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=True, rotatelabels=False)
 
     ax.set(xticks=(), yticks=())
-
-    # piechart_path = pathlib.Path(__file__).parent.resolve() / 'spent.png'
 
     buf = io.BytesIO()
     plt.savefig(buf, bbox_inches='tight', format='png')
