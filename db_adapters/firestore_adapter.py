@@ -10,6 +10,15 @@ from db_adapters.adapter import PurchaseInfo
 # TODO: transactions!
 class FirestoreAdapter:
     def __init__(self, sleep_wait_ms: int = 0):
+        """
+        Initializes a FirestoreAdapter instance.
+
+        :param sleep_wait_ms: The amount of time, in milliseconds, to wait between operations.
+                             Default is 0, indicating no sleep/wait time.
+                             (only for testing purposes)
+
+        :raises ValueError: If the sleep_wait_ms parameter is not an integer.
+        """
         project_id = os.getenv('BUDBOT_PROJECT_ID')
         self.db = Client(project=project_id)
         self.sleep_wait_ms = sleep_wait_ms  # used for race condition tests, = 0 in production
@@ -24,7 +33,8 @@ class FirestoreAdapter:
             else:
                 month_database.set({'last_id': "0"})
                 last_id = 0
-            time.sleep(self.sleep_wait_ms / 1000)  # artificially turns on >0 in tests to test race condition
+            if self.sleep_wait_ms > 0:
+                time.sleep(self.sleep_wait_ms / 1000)  # artificially turns on >0 in tests to test race condition
             self.db.collection("months").document(get_month_today()).update({'last_id': str(last_id)})
 
             curr_purchase = self.db.collection("months").document(get_month_today()).collection("items").document(str(last_id))
