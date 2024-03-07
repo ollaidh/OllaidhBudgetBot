@@ -62,7 +62,7 @@ Login into your account with `gcloud auth login` (optional?)
 Run firestore emulator
 
 ```
-cloud emulators firestore start --host-port localhost:8090
+gcloud emulators firestore start --host-port localhost:8090
 ```
 
 Set environment variables:
