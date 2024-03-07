@@ -24,7 +24,7 @@ class FirestoreAdapter:
             else:
                 month_database.set({'last_id': "0"})
                 last_id = 0
-            time.sleep(self.sleep_wait_ms / 1000)
+            time.sleep(self.sleep_wait_ms / 1000)  # artificially turns on >0 in tests to test race condition
             self.db.collection("months").document(get_month_today()).update({'last_id': str(last_id)})
 
             curr_purchase = self.db.collection("months").document(get_month_today()).collection("items").document(str(last_id))
