@@ -3,6 +3,8 @@ import unittest
 
 import requests
 
+import threading
+
 from db_adapters.firestore_adapter import FirestoreAdapter
 from db_adapters.adapter import PurchaseInfo
 from unittest.mock import patch
@@ -64,6 +66,53 @@ class MyTestCase(unittest.TestCase):
             "category": "dog",
             "date": date_mock()
         })
+
+    @patch('db_adapters.firestore_adapter.get_month_today')
+    @patch('db_adapters.firestore_adapter.get_date_today')
+    def test_add_purchase_race_condition(self, date_mock, month_mock):
+        barrier = threading.Barrier(3)
+        adapter = FirestoreAdapter(sleep_wait_ms=1000)
+
+        def add_purchase_coffee():
+            barrier.wait()
+            month_mock.return_value = "2000-04"
+            date_mock.return_value = "2000-04-01"
+            adapter.add_purchase(PurchaseInfo("thread_coffee", 1, "thread_coffee"))
+
+        def add_purchase_tea():
+            barrier.wait()
+            month_mock.return_value = "2000-05"
+            date_mock.return_value = "2000-05-02"
+            adapter.add_purchase(PurchaseInfo("thread_tea", 2, "thread_tea"))
+
+        month_mock.return_value = "2000-01"
+        date_mock.return_value = "2000-01-01"
+        success = adapter.add_purchase(PurchaseInfo("coffee", 3, "takeaway"))
+        self.assertTrue(success)
+
+        self.assertEqual({'TOTAL': 3, 'takeaway': 3},
+                         adapter.calculate_spent("2000-01", "2000-02", "$each"))
+
+        month_mock.return_value = "2000-02"
+        date_mock.return_value = "2000-02-15"
+        adapter.add_purchase(PurchaseInfo("bulka", 4, "bread"))
+
+        self.assertEqual({'TOTAL': 7, 'bread': 4, 'takeaway': 3},
+                         adapter.calculate_spent("2000-01", "2000-03", "$each"))
+
+        buy_coffee = threading.Thread(target=add_purchase_coffee)
+        buy_coffee.start()
+
+        buy_tea = threading.Thread(target=add_purchase_tea)
+        buy_tea.start()
+
+        barrier.wait()
+
+        buy_coffee.join()
+        buy_tea.join()
+
+        self.assertEqual({'TOTAL': 10, 'bread': 4, 'takeaway': 3, 'thread_coffee': 1, 'thread_tea': 2},
+                         adapter.calculate_spent("2000-01", "2000-05", "$each"))
 
     @patch('db_adapters.firestore_adapter.get_month_today')
     @patch('db_adapters.firestore_adapter.get_date_today')
