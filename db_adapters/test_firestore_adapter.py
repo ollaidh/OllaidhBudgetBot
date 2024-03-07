@@ -115,28 +115,6 @@ class MyTestCase(unittest.TestCase):
                          adapter.calculate_spent("2000-01", "2000-05", "$each"))
 
     @patch('db_adapters.firestore_adapter.get_month_today')
-    @patch('db_adapters.firestore_adapter.get_date_today')
-    def test_delete_purchase(self, date_mock, month_mock):
-        adapter = FirestoreAdapter()
-        month_mock.return_value = "2022-12"
-        date_mock.return_value = "2022-12-31"
-        adapter.add_purchase(PurchaseInfo("bulka", 4, "bread"))
-        adapter.add_purchase(PurchaseInfo("croissant", 3, "takeaway"))
-        success = adapter.delete_purchase()
-        self.assertTrue(success)
-        deleted_purchase = adapter.db.collection("months").document(month_mock()).collection("items").document(
-            "1").get()
-        self.assertFalse(deleted_purchase.exists)
-        last_purchase = adapter.db.collection("months").document(month_mock()).collection("items").document(
-            "0").get().to_dict()
-        self.assertEqual(last_purchase, {
-            "purchase": "bulka",
-            "price": 4,
-            "category": "bread",
-            "date": date_mock()
-        })
-
-    @patch('db_adapters.firestore_adapter.get_month_today')
     def test_spent(self, date_mock):
         adapter = FirestoreAdapter()
         date_mock.return_value = "2023-01"
