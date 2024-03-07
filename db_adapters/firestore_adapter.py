@@ -1,4 +1,5 @@
 import os
+import time
 
 from google.cloud.firestore import Client
 from typing import Optional
@@ -8,10 +9,10 @@ from db_adapters.adapter import PurchaseInfo
 
 # TODO: transactions!
 class FirestoreAdapter:
-    def __init__(self):
+    def __init__(self, sleep_wait_ms: int = 0):
         project_id = os.getenv('BUDBOT_PROJECT_ID')
         self.db = Client(project=project_id)
-        # self.date = str(datetime.date.today())[:-3]
+        self.sleep_wait_ms = sleep_wait_ms  # used for race condition tests, = 0 in production
 
     def add_purchase(self, purchase: PurchaseInfo) -> bool:
         try:
@@ -23,7 +24,7 @@ class FirestoreAdapter:
             else:
                 month_database.set({'last_id': "0"})
                 last_id = 0
-
+            time.sleep(self.sleep_wait_ms / 1000)
             self.db.collection("months").document(get_month_today()).update({'last_id': str(last_id)})
 
             curr_purchase = self.db.collection("months").document(get_month_today()).collection("items").document(str(last_id))
