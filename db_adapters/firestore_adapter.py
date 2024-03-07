@@ -31,30 +31,30 @@ class FirestoreAdapter:
         def add(trans) -> bool:
             try:
                 month_database = self.db.collection("months").document(get_month_today())
-                data = month_database.get(transaction=transaction).to_dict()
+                data = month_database.get(transaction=trans).to_dict()
                 if data:
                     last_id = int(data['last_id'])
                     last_id += 1
                 else:
-                    transaction.set(month_database, {'last_id': "0"})
-                    # transaction.update(month_database, {'last_id': "0"})
+                    trans.set(month_database, {'last_id': "0"})
                     last_id = 0
                 if self.sleep_wait_ms > 0:
                     time.sleep(self.sleep_wait_ms / 1000)  # artificially turns on >0 in tests to test race condition
-                transaction.set(month_database, {'last_id': str(last_id)})
+                trans.set(month_database, {'last_id': str(last_id)})
 
                 curr_purchase = month_database.collection("items").document(str(last_id))
-                transaction.set(curr_purchase,
-                                   {
-                                       "purchase": purchase.name,
-                                       "price": purchase.price,
-                                       "category": purchase.category,
-                                       "date": get_date_today()
-                                   })
+                trans.set(curr_purchase,
+                          {
+                              "purchase": purchase.name,
+                              "price": purchase.price,
+                              "category": purchase.category,
+                              "date": get_date_today()
+                          })
                 return True
             except Exception as err:
                 print(err)
                 return False
+
         return add(transaction)
 
     # @firestore.transactional
@@ -62,7 +62,8 @@ class FirestoreAdapter:
         try:
             last_id = self.db.collection("months").document(get_month_today()).get().to_dict()['last_id']
             if last_id:
-                self.db.collection("months").document(get_month_today()).collection('items').document(str(last_id)).delete()
+                self.db.collection("months").document(get_month_today()).collection('items').document(
+                    str(last_id)).delete()
                 self.db.collection("months").document(get_month_today()).update({'last_id': str(int(last_id) - 1)})
             return True
         except:
@@ -99,7 +100,3 @@ class FirestoreAdapter:
             return result
         except:
             return None
-
-
-
-
