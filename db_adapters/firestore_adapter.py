@@ -56,6 +56,18 @@ class FirestoreAdapter:
                 return False
 
         return add(transaction)
+    
+        # @firestore.transactional
+    def delete_purchase(self) -> bool:
+        try:
+            last_id = self.db.collection("months").document(get_month_today()).get().to_dict()['last_id']
+            if last_id:
+                self.db.collection("months").document(get_month_today()).collection('items').document(
+                    str(last_id)).delete()
+                self.db.collection("months").document(get_month_today()).update({'last_id': str(int(last_id) - 1)})
+            return True
+        except:
+            return False
 
     def calculate_spent(self, start_date: str, end_date: str, category: str) -> Optional[dict]:
         try:
@@ -88,3 +100,5 @@ class FirestoreAdapter:
             return result
         except:
             return None
+
+    def 
