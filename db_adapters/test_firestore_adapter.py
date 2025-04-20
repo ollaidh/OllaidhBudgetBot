@@ -10,7 +10,7 @@ from db_adapters.adapter import PurchaseInfo
 from unittest.mock import patch
 
 
-def setUp() -> None:
+def test_setUp() -> None:
     emulator_host = os.getenv("FIRESTORE_EMULATOR_HOST")
     assert emulator_host is not None
     project_id = os.getenv("BUDBOT_PROJECT_ID")
@@ -23,8 +23,6 @@ def setUp() -> None:
 @patch("db_adapters.firestore_adapter.get_month_today")
 @patch("db_adapters.firestore_adapter.get_date_today")
 def test_add_purchase(date_mock, month_mock):
-    setUp()
-
     adapter = FirestoreAdapter()
 
     month_mock.return_value = "2022-10"
