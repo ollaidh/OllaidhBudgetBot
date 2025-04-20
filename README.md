@@ -80,6 +80,28 @@ Run pytest tests
 ```
 pytest .
 ```
+launch.json for pytest example:
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug specific pytest file",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "db_adapters/test_firestore_adapter.py"
+            ],
+            "justMyCode": true,
+            "env": {
+                "BUDBOT_PROJECT_ID": "ollaidhbudbot",
+                "FIRESTORE_EMULATOR_HOST": "localhost:8090",
+            }
+        }
+    ]
+}
+```
 
 ## Deploy
 
