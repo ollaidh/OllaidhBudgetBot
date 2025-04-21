@@ -126,3 +126,23 @@ class FirestoreAdapter:
                 return False
 
         return set(transaction)
+
+    def get_month_limit(self, month: str | None):
+        """
+        Get spend limit for certain month, if not month passed then for current month
+        """
+
+        transaction = self.db.transaction()
+
+        @firestore.transactional
+        def set(trans) -> bool:
+            try:
+                month = get_month_today() if not month else month
+                month_database = self.db.collection("months").document(month)
+                limits = month_database.get(transaction=trans).to_dict()["month_spend_limits"]
+                return limits
+            except Exception as err:
+                print(err)
+                return False
+
+        return set(transaction)

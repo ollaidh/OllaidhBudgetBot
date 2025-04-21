@@ -4,5 +4,6 @@ from .command_help import *
 from .command_spent import *
 from .command_chart import *
 from .command_set_limit import *
+from .command_get_limit import *
 from .command_version import *
 from .exceptions import *

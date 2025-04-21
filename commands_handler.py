@@ -14,6 +14,7 @@ class CommandsHandler:
             "!chart": commands.ChartCommandExecutor(),
             "!version": commands.VersionCommandExecutor(),
             "!set_month_spend_limit": commands.SetMonthSpendLimitCommandExecutor(),
+            "!month_limit": commands.GetMonthSpendLimitCommandExecutor(),
         }
         self.database_adapter = database_adapter
 
