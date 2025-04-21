@@ -12,19 +12,13 @@ class TestDel(unittest.TestCase):
 
         adapter = TestAdapter()
         adapter.delete_purchase = MagicMock(return_value=True)
-        self.assertEqual(
-            {'message': 'DELETED: Last purchase'},
-            command.execute(adapter, [])
-        )
+        self.assertEqual({"message": "DELETED: Last purchase"}, command.execute(adapter, []))
 
         adapter.delete_purchase = MagicMock(return_value=False)
-        self.assertEqual(
-            {'message': 'FAILED to delete last purchase from database'},
-            command.execute(adapter, [])
-        )
+        self.assertEqual({"message": "FAILED to delete last purchase from database"}, command.execute(adapter, []))
 
-        self.assertRaises(InvalidParametersException, command.execute, adapter, ['purchase'])
+        self.assertRaises(InvalidParametersException, command.execute, adapter, ["purchase"])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

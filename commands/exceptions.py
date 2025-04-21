@@ -7,12 +7,12 @@ class FailedAccessDatabaseException(BotException):
         self.action = action
 
     def __str__(self):
-        return f'No access to database. Failed to {self.action}!'
+        return f"No access to database. Failed to {self.action}!"
 
 
 class NoPurchacesThisParametersException(BotException):
     def __str__(self):
-        return f'No purchases with these parameters.'
+        return f"No purchases with these parameters."
 
 
 class InvalidCommandException(BotException):
@@ -26,20 +26,19 @@ class InvalidCommandException(BotException):
 
 class InvalidParametersException(BotException):
     def __str__(self):
-        return 'Invalid parameters!'
+        return "Invalid parameters!"
 
 
 class NegativePriceException(InvalidParametersException):
     def __str__(self):
-        return 'Invalid price: negative!'
+        return "Invalid price: negative!"
 
 
 class NotNumberPriceException(InvalidParametersException):
     def __str__(self):
-        return 'Invalid price: not a number!'
+        return "Invalid price: not a number!"
 
 
 class InvalidNumberParametersException(InvalidParametersException):
     def __str__(self):
-        return 'Invalid number of parameters!'
-
+        return "Invalid number of parameters!"

@@ -20,7 +20,7 @@ class FirestoreAdapter:
 
         :raises ValueError: If the sleep_wait_ms parameter is not an integer.
         """
-        project_id = os.getenv('BUDBOT_PROJECT_ID')
+        project_id = os.getenv("BUDBOT_PROJECT_ID")
         self.db = Client(project=project_id)
         self.sleep_wait_ms = sleep_wait_ms  # used for race condition tests, = 0 in production
 
@@ -33,38 +33,42 @@ class FirestoreAdapter:
                 month_database = self.db.collection("months").document(get_month_today())
                 data = month_database.get(transaction=trans).to_dict()
                 if data:
-                    last_id = int(data['last_id'])
+                    last_id = int(data["last_id"])
                     last_id += 1
                 else:
-                    trans.set(month_database, {'last_id': "0"})
+                    trans.set(month_database, {"last_id": "0"})
                     last_id = 0
                 if self.sleep_wait_ms > 0:
                     time.sleep(self.sleep_wait_ms / 1000)  # artificially turns on >0 in tests to test race condition
-                trans.set(month_database, {'last_id': str(last_id)})
+                trans.set(month_database, {"last_id": str(last_id)})
 
                 curr_purchase = month_database.collection("items").document(str(last_id))
-                trans.set(curr_purchase,
-                          {
-                              "purchase": purchase.name,
-                              "price": purchase.price,
-                              "category": purchase.category,
-                              "date": get_date_today()
-                          })
+                trans.set(
+                    curr_purchase,
+                    {
+                        "purchase": purchase.name,
+                        "price": purchase.price,
+                        "category": purchase.category,
+                        "date": get_date_today(),
+                    },
+                )
                 return True
             except Exception as err:
                 print(err)
                 return False
 
         return add(transaction)
-    
+
         # @firestore.transactional
+
     def delete_purchase(self) -> bool:
         try:
-            last_id = self.db.collection("months").document(get_month_today()).get().to_dict()['last_id']
+            last_id = self.db.collection("months").document(get_month_today()).get().to_dict()["last_id"]
             if last_id:
-                self.db.collection("months").document(get_month_today()).collection('items').document(
-                    str(last_id)).delete()
-                self.db.collection("months").document(get_month_today()).update({'last_id': str(int(last_id) - 1)})
+                self.db.collection("months").document(get_month_today()).collection("items").document(
+                    str(last_id)
+                ).delete()
+                self.db.collection("months").document(get_month_today()).update({"last_id": str(int(last_id) - 1)})
             return True
         except:
             return False
@@ -82,23 +86,62 @@ class FirestoreAdapter:
                 if not items:
                     continue
                 for item in items:
-                    if category not in [item.to_dict()["category"], '$all', '$each']:
+                    if category not in [item.to_dict()["category"], "$all", "$each"]:
                         continue
-                    if category == '$all':
+                    if category == "$all":
                         add_to_spent(category, item.to_dict()["price"])
-                    elif category == '$each':
+                    elif category == "$each":
                         add_to_spent(item.to_dict()["category"], item.to_dict()["price"])
                     else:
                         add_to_spent(item.to_dict()["category"].upper(), item.to_dict()["price"])
                         add_to_spent(item.to_dict()["purchase"], item.to_dict()["price"])
-            if category == '$each' and spent:
+            if category == "$each" and spent:
                 spent_total = 0
                 for key in spent:
                     spent_total += spent[key]
-                spent['TOTAL'] = spent_total
-            result = {k: v for k, v in sorted(spent.items(), key=lambda x: - x[1])}
+                spent["TOTAL"] = spent_total
+            result = {k: v for k, v in sorted(spent.items(), key=lambda x: -x[1])}
             return result
         except:
             return None
 
-    def 
+    def set_month_limit(self, limit):
+        """
+        Set how much money you wish to spend during current month - for burndown tracking.
+        If month spend limit already set, new value will overwrite it
+        """
+
+        transaction = self.db.transaction()
+
+        @firestore.transactional
+        def set(trans) -> bool:
+            try:
+                month_database = self.db.collection("months").document(get_month_today())
+                trans.set(month_database, {"last_id": "0"})
+                data = month_database.get(transaction=trans).to_dict()
+                if data:
+                    last_id = int(data["last_id"])
+                    last_id += 1
+                else:
+                    trans.set(month_database, {"last_id": "0"})
+                    last_id = 0
+                if self.sleep_wait_ms > 0:
+                    time.sleep(self.sleep_wait_ms / 1000)  # artificially turns on >0 in tests to test race condition
+                trans.set(month_database, {"last_id": str(last_id)})
+
+                curr_purchase = month_database.collection("items").document(str(last_id))
+                trans.set(
+                    curr_purchase,
+                    {
+                        "purchase": purchase.name,
+                        "price": purchase.price,
+                        "category": purchase.category,
+                        "date": get_date_today(),
+                    },
+                )
+                return True
+            except Exception as err:
+                print(err)
+                return False
+
+        return set(transaction)

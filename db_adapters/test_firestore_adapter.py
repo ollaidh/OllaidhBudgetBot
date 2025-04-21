@@ -30,14 +30,7 @@ def test_add_purchase(date_mock, month_mock):
     success = adapter.add_purchase(PurchaseInfo("coffee", 3, "takeaway"))
     assert success is True
 
-    purch1 = (
-        adapter.db.collection("months")
-        .document(month_mock())
-        .collection("items")
-        .document("0")
-        .get()
-        .to_dict()
-    )
+    purch1 = adapter.db.collection("months").document(month_mock()).collection("items").document("0").get().to_dict()
     assert {
         "purchase": "coffee",
         "price": 3,
@@ -50,14 +43,7 @@ def test_add_purchase(date_mock, month_mock):
     success = adapter.add_purchase(PurchaseInfo("bulka", 4, "bread"))
     assert success is True
 
-    purch2 = (
-        adapter.db.collection("months")
-        .document(month_mock())
-        .collection("items")
-        .document("0")
-        .get()
-        .to_dict()
-    )
+    purch2 = adapter.db.collection("months").document(month_mock()).collection("items").document("0").get().to_dict()
     assert purch2 == {
         "purchase": "bulka",
         "price": 4,
@@ -67,14 +53,7 @@ def test_add_purchase(date_mock, month_mock):
 
     success = adapter.add_purchase(PurchaseInfo("poop bag", 1, "dog"))
     assert success is True
-    purch3 = (
-        adapter.db.collection("months")
-        .document(month_mock())
-        .collection("items")
-        .document("1")
-        .get()
-        .to_dict()
-    )
+    purch3 = adapter.db.collection("months").document(month_mock()).collection("items").document("1").get().to_dict()
     assert purch3 == {
         "purchase": "poop bag",
         "price": 1,
@@ -106,17 +85,13 @@ def test_add_purchase_race_condition(date_mock, month_mock):
     success = adapter.add_purchase(PurchaseInfo("coffee", 3, "takeaway"))
     assert success is True
 
-    assert {"TOTAL": 3, "takeaway": 3} == adapter.calculate_spent(
-        "2000-01", "2000-02", "$each"
-    )
+    assert {"TOTAL": 3, "takeaway": 3} == adapter.calculate_spent("2000-01", "2000-02", "$each")
 
     month_mock.return_value = "2000-02"
     date_mock.return_value = "2000-02-15"
     adapter.add_purchase(PurchaseInfo("bulka", 4, "bread"))
 
-    assert {"TOTAL": 7, "bread": 4, "takeaway": 3} == adapter.calculate_spent(
-        "2000-01", "2000-03", "$each"
-    )
+    assert {"TOTAL": 7, "bread": 4, "takeaway": 3} == adapter.calculate_spent("2000-01", "2000-03", "$each")
 
     buy_coffee = threading.Thread(target=add_purchase_coffee)
     buy_coffee.start()
@@ -162,9 +137,7 @@ def test_spent(date_mock):
 
     spent_result = adapter.calculate_spent("2023-01", "2023-02", "$each")
     assert isinstance(spent_result, dict) is True
-    assert [("TOTAL", 36.0), ("dog", 20), ("takeaway", 14.5), ("bread", 1.5)] == list(
-        spent_result.items()
-    )
+    assert [("TOTAL", 36.0), ("dog", 20), ("takeaway", 14.5), ("bread", 1.5)] == list(spent_result.items())
 
     spent_result = adapter.calculate_spent("2028-01", "2029-02", "")
     assert spent_result == {}
@@ -183,4 +156,10 @@ def test_spent(date_mock):
 def test_set_month_limit(date_mock):
     adapter = FirestoreAdapter()
     date_mock.return_value = "2025-03"
-    adapter.set_month_limit(2000)
+
+    adapter.add_purchase(PurchaseInfo("zoloft", 20, "kukuha"))
+    adapter.add_purchase(PurchaseInfo("magnesium", 20, "health"))
+    adapter.add_purchase(PurchaseInfo("wine", 20, "alcohol"))
+
+    result = adapter.set_month_limit(2000)
+    assert result is True

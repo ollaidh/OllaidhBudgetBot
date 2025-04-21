@@ -5,17 +5,17 @@ from db_adapters.adapter import PurchaseInfo
 
 def get_category(item: str) -> str:
     categories = {
-        'meat': ('steak', 'pork', 'chicken', 'liver', 'bacon', 'meat'),
-        'takeaway': ('coffee', 'pasrty', 'breakfast', 'lunch', 'dinner', 'takeaway'),
-        'utilities': ('electricity', 'water', 'internet'),
-        'sweets': ('cookies', 'chocolate', 'sweets'),
-        'vegetables': ('potatoes', 'green', 'avocado', 'vegetables'),
-        'dairy': ('milk', 'yogurt', 'cheese', 'dairy')
+        "meat": ("steak", "pork", "chicken", "liver", "bacon", "meat"),
+        "takeaway": ("coffee", "pasrty", "breakfast", "lunch", "dinner", "takeaway"),
+        "utilities": ("electricity", "water", "internet"),
+        "sweets": ("cookies", "chocolate", "sweets"),
+        "vegetables": ("potatoes", "green", "avocado", "vegetables"),
+        "dairy": ("milk", "yogurt", "cheese", "dairy"),
     }
     for category, items in categories.items():
         if item in items:
             return category
-    return 'uncategorized'
+    return "uncategorized"
 
 
 class BuyCommandExecutor:
@@ -39,8 +39,8 @@ class BuyCommandExecutor:
     def execute(self, database_adapter, user_input: list[str]) -> dict:
         parameters = self.validate(user_input)
         buy = database_adapter.add_purchase(PurchaseInfo(parameters.name, parameters.price, parameters.category))
-        purchase = f'{parameters.name} {parameters.price} {parameters.category}'
+        purchase = f"{parameters.name} {parameters.price} {parameters.category}"
         comment = self.jibjab.toxic_response(parameters.name, parameters.category)
         if buy:
-            return {'message': f'ADDED PURCHASE: {purchase}\n{comment}'}
-        raise FailedAccessDatabaseException('add purchase')
+            return {"message": f"ADDED PURCHASE: {purchase}\n{comment}"}
+        raise FailedAccessDatabaseException("add purchase")

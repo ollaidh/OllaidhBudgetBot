@@ -6,17 +6,18 @@ from db_adapters.adapter import Adapter
 class CommandsHandler:
     def __init__(self, database_adapter: Adapter):
         self.executors = {
-            '!help': commands.HelpCommandExecutor(),
-            '!buy': commands.BuyCommandExecutor(),
-            '!del': commands.DelCommandExecutor(),
-            '!spent': commands.SpentCommandExecutor(),
-            '!chart': commands.ChartCommandExecutor(),
-            '!version': commands.VersionCommandExecutor()
+            "!help": commands.HelpCommandExecutor(),
+            "!buy": commands.BuyCommandExecutor(),
+            "!del": commands.DelCommandExecutor(),
+            "!spent": commands.SpentCommandExecutor(),
+            "!chart": commands.ChartCommandExecutor(),
+            "!version": commands.VersionCommandExecutor(),
+            "!set_month_spend_limit": commands.SetMonthSpendLimitCommandExecutor(),
         }
         self.database_adapter = database_adapter
 
     def handle_message(self, msg: str) -> Optional[dict]:
-        if msg.startswith('!'):
+        if msg.startswith("!"):
             msg = msg.split()
             command = msg[0]
 
@@ -25,6 +26,3 @@ class CommandsHandler:
             parameters = msg[1:]
             return self.executors[command].execute(self.database_adapter, parameters)
         return None
-
-
-

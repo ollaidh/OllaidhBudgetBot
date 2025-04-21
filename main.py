@@ -12,7 +12,7 @@ handler = commands_handler.CommandsHandler(adapter)
 
 @client.event
 async def on_ready():
-    print(f'We have logged in as {client.user}')
+    print(f"We have logged in as {client.user}")
 
 
 @client.event
@@ -22,16 +22,15 @@ async def on_message(message):
 
     try:
         msg_back = handler.handle_message(message.content)
-        if 'message' in msg_back:
-            await message.channel.send(msg_back['message'])
-        if 'chart_path' in msg_back:
-            msg_back['chart_path'].seek(0)
-            file = discord.File(msg_back['chart_path'], 'pie.png')
+        if "message" in msg_back:
+            await message.channel.send(msg_back["message"])
+        if "chart_path" in msg_back:
+            msg_back["chart_path"].seek(0)
+            file = discord.File(msg_back["chart_path"], "pie.png")
             await message.channel.send(file=file)
     except commands.BotException as err:
         msg_back = str(err)
         await message.channel.send(msg_back)
 
 
-client.run(os.getenv('DISCORD_BOT_TOKEN'))
-
+client.run(os.getenv("DISCORD_BOT_TOKEN"))
