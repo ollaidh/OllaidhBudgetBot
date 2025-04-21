@@ -116,7 +116,11 @@ class FirestoreAdapter:
         @firestore.transactional
         def set(trans) -> bool:
             try:
-                return True
+                month_database = self.db.collection("months").document(get_month_today())
+                limits = month_database.get(transaction=trans).to_dict()["month_spend_limits"]
+                if limits is not None and limit != limits[-1]:
+                    trans.set(month_database, {"month_spend_limits": limits.append(limit)})
+                return True, limits
             except Exception as err:
                 print(err)
                 return False
