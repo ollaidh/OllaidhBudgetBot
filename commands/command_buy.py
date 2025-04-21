@@ -1,4 +1,5 @@
 from commands.exceptions import *
+from commands.command_executor import CommandExecutor
 from jibberjabber import JibberJabber
 from db_adapters.adapter import PurchaseInfo
 
@@ -18,7 +19,7 @@ def get_category(item: str) -> str:
     return "uncategorized"
 
 
-class BuyCommandExecutor:
+class BuyCommandExecutor(CommandExecutor):
     def __init__(self):
         self.jibjab = JibberJabber()
 

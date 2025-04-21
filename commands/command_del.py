@@ -1,7 +1,8 @@
 from commands.exceptions import *
+from commands.command_executor import CommandExecutor
 
 
-class DelCommandExecutor:
+class DelCommandExecutor(CommandExecutor):
     def validate(self, parameters: list[str]) -> bool:
         if not parameters:
             return True

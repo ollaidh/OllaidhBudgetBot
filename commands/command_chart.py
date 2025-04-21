@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from commands import command_spent
 from commands.exceptions import *
+from commands.command_executor import CommandExecutor
+
 import io
 
 
@@ -47,7 +49,7 @@ def piechart_maker(spent: dict, start_date: str, end_date: str) -> io.BytesIO:
     return buf
 
 
-class ChartCommandExecutor:
+class ChartCommandExecutor(CommandExecutor):
     def execute(self, database_adapter, user_input: list[str]) -> dict:
         spent_items = command_spent.SpentCommandExecutor()
         parameters = spent_items.validate(user_input)

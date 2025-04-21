@@ -2,6 +2,7 @@ import datetime
 from datetime import datetime
 from typing import Optional
 from commands.exceptions import *
+from commands.command_executor import CommandExecutor
 
 
 def get_date(line: str) -> Optional[str]:
@@ -56,7 +57,7 @@ def validate_spent_param_len3(parameters: list[str], spent_parameters: dict) -> 
     return None
 
 
-class SpentCommandExecutor:
+class SpentCommandExecutor(CommandExecutor):
     def __init__(self):
         self.validators = {
             0: validate_spent_param_len0,

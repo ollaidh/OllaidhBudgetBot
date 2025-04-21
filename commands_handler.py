@@ -1,11 +1,12 @@
 import commands
 from typing import Optional
 from db_adapters.adapter import Adapter
+from commands.command_executor import CommandExecutor
 
 
 class CommandsHandler:
     def __init__(self, database_adapter: Adapter):
-        self.executors = {
+        self.executors: dict[str, CommandExecutor] = {
             "!help": commands.HelpCommandExecutor(),
             "!buy": commands.BuyCommandExecutor(),
             "!del": commands.DelCommandExecutor(),
@@ -18,11 +19,11 @@ class CommandsHandler:
 
     def handle_message(self, msg: str) -> Optional[dict]:
         if msg.startswith("!"):
-            msg = msg.split()
-            command = msg[0]
+            words = msg.split()
+            command = words[0]
 
             if command not in self.executors:
                 raise commands.InvalidCommandException(command, list(self.executors.keys()))
-            parameters = msg[1:]
+            parameters = words[1:]
             return self.executors[command].execute(self.database_adapter, parameters)
         return None

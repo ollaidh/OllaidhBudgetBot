@@ -1,4 +1,5 @@
 from commands.exceptions import *
+from commands.command_executor import CommandExecutor
 
 
 def validate_help_parameters(parameters) -> bool:
@@ -10,7 +11,7 @@ def validate_help_parameters(parameters) -> bool:
     return parameters[0] in help_items
 
 
-class HelpCommandExecutor:
+class HelpCommandExecutor(CommandExecutor):
     def execute(self, database_adapter, parameters: list[str]) -> dict:
         help_info = {
             None: "Ollaidh BUDget BUDdy - track your budget.\nCommands: buy, del, spent\nTo get info on each command, "

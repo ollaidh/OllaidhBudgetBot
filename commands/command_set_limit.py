@@ -1,24 +1,25 @@
 from commands.exceptions import *
+from commands.command_executor import CommandExecutor
 from jibberjabber import JibberJabber
 
 
-class SetMonthSpendLimitCommandExecutor:
+class SetMonthSpendLimitCommandExecutor(CommandExecutor):
     def __init__(self):
         self.jibjab = JibberJabber()
 
-    def validate(self, user_input: list[str]) -> PurchaseInfo:
+    def validate(self, user_input: list[str]):
         try:
             month_spend_limit = int(user_input[0])
-            if month_spend_limit < 1500:  # TODO remove hardcode, do better
-                self.jibjab.month_limit_kind_warning(month_spend_limit)
+            if month_spend_limit <= 0:
+                raise ValueError
+            return month_spend_limit
         except ValueError:
             raise InvalidParametersException
 
-    def execute(self, database_adapter, user_input: list[str]) -> dict:
-        parameters = self.validate(user_input)
-        buy = database_adapter.add_purchase(PurchaseInfo(parameters.name, parameters.price, parameters.category))
-        purchase = f"{parameters.name} {parameters.price} {parameters.category}"
-        comment = self.jibjab.toxic_response(parameters.name, parameters.category)
-        if buy:
-            return {"message": f"ADDED PURCHASE: {purchase}\n{comment}"}
+    def execute(self, database_adapter, user_input: list[str]) -> dict[str, str]:
+        month_spend_limit = self.validate(user_input)
+        comment = self.jibjab.month_limit_kind_warning(month_spend_limit) if month_spend_limit < 1500 else None
+        added_month_limit = database_adapter.set_month_limit(month_spend_limit)
+        if added_month_limit:
+            return {"message": f"MONTH SPENT LIMIT SET: {month_spend_limit} EUR\n{comment}"}
         raise FailedAccessDatabaseException("add purchase")
