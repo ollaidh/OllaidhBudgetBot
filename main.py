@@ -9,6 +9,9 @@ client = discord.Client(intents=intents)
 adapter = FirestoreAdapter()
 handler = commands_handler.CommandsHandler(adapter)
 
+bot_token = os.getenv("DISCORD_BOT_TOKEN")
+assert bot_token
+
 
 @client.event
 async def on_ready():
@@ -33,4 +36,4 @@ async def on_message(message):
         await message.channel.send(msg_back)
 
 
-client.run(os.getenv("DISCORD_BOT_TOKEN"))
+client.run(bot_token)

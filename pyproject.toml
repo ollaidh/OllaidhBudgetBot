@@ -1,3 +1,7 @@
 [tool.ruff]
 line-length = 120
 select = ["E"]
+
+[[tool.mypy.overrides]]
+module = "google.cloud.*"
+ignore_missing_imports = true

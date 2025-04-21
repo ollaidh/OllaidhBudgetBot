@@ -33,5 +33,6 @@ class AppYaml:
 
 if __name__ == "__main__":
     bot_token = os.getenv("DISCORD_BOT_TOKEN")
+    assert bot_token
     with AppYaml(bot_token) as ay:
         os.system(r"gcloud app deploy --quiet")

@@ -1,4 +1,3 @@
-import datetime
 from datetime import datetime
 from typing import Optional
 from commands.exceptions import *
@@ -34,13 +33,14 @@ def validate_spent_param_len1(parameters: list[str], spent_parameters: dict) -> 
 
 
 def validate_spent_param_len2(parameters: list[str], spent_parameters: dict) -> Optional[dict]:
-    if get_date(parameters[0]) and get_date(parameters[1]) and (get_date(parameters[0]) <= get_date(parameters[1])):
-        spent_parameters["start_date"] = get_date(parameters[0])
-        spent_parameters["end_date"] = get_date(parameters[1])
+    start_date, end_date = get_date(parameters[0]), get_date(parameters[1])
+    if start_date and end_date and (start_date <= end_date):
+        spent_parameters["start_date"] = start_date
+        spent_parameters["end_date"] = end_date
         spent_parameters["category"] = "$each"
     else:
-        if get_date(parameters[0]):
-            spent_parameters["start_date"] = get_date(parameters[0])
+        if start_date:
+            spent_parameters["start_date"] = start_date
             spent_parameters["end_date"] = spent_parameters["start_date"]
             spent_parameters["category"] = parameters[1]
         else:
@@ -49,9 +49,10 @@ def validate_spent_param_len2(parameters: list[str], spent_parameters: dict) -> 
 
 
 def validate_spent_param_len3(parameters: list[str], spent_parameters: dict) -> Optional[dict]:
-    if get_date(parameters[0]) and get_date(parameters[1]) and (get_date(parameters[0]) <= get_date(parameters[1])):
-        spent_parameters["start_date"] = get_date(parameters[0])
-        spent_parameters["end_date"] = get_date(parameters[1])
+    start_date, end_date = get_date(parameters[0]), get_date(parameters[1])
+    if start_date and end_date and (start_date <= end_date):
+        spent_parameters["start_date"] = start_date
+        spent_parameters["end_date"] = end_date
         spent_parameters["category"] = parameters[2]
         return spent_parameters
     return None

@@ -1,8 +1,5 @@
 import os
-import unittest
-
 import requests
-
 import threading
 
 from db_adapters.firestore_adapter import FirestoreAdapter

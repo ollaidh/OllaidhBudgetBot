@@ -49,4 +49,4 @@ class JibberJabber:
         return ""
 
     def month_limit_kind_warning(self, limit: str) -> str:
-        return f"Hoping to live at {limit} eur per month - you are either optimistic or stupid! Good luck!"
+        return f"Hoping to live at {limit} eur per month - you are either optimistic or stupid! But OK...."
