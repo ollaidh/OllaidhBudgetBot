@@ -157,17 +157,14 @@ def test_set_month_limit(month_mock: MagicMock) -> None:
     adapter = FirestoreAdapter()
     month_mock.return_value = "2025-03"
 
-    adapter.add_purchase(PurchaseInfo("zoloft", 20, "kukuha"))
-    adapter.add_purchase(PurchaseInfo("magnesium", 20, "health"))
-    adapter.add_purchase(PurchaseInfo("wine", 20, "alcohol"))
+    limit = adapter.get_month_limit()
+    assert limit is False
 
     limit_is_set = adapter.set_month_limit("2000")
     assert limit_is_set is True
-    limits = adapter.get_month_limit()
-    assert limits == ["2000"]
+    limit = adapter.get_month_limit()
+    assert limit == "2000"
 
-    adapter.set_month_limit("2100")
-    adapter.set_month_limit("2500")
     adapter.set_month_limit("3000")
-    limits = adapter.get_month_limit()
-    assert limits == ["2000", "2100", "2500", "3000"]
+    limit = adapter.get_month_limit()
+    assert limit == "3000"

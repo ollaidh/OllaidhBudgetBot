@@ -114,22 +114,18 @@ class FirestoreAdapter:
         transaction = self.db.transaction()
 
         @firestore.transactional
-        def set(trans) -> bool:
+        def set_limit(trans, limit) -> bool:
             try:
-                month_database = self.db.collection("months").document(get_month_today())
-                limits = month_database.get(transaction=trans).to_dict().get("month_spend_limits")
-                if limits is None:
-                    trans.set(month_database, {"month_spend_limits": [limit]})
-                elif limit != limits[-1]:
-                    trans.set(month_database, {"month_spend_limits": limits.append(limit)})
+                settings_database = self.db.collection("settings").document("month_spend_limit")
+                trans.set(settings_database, {"month_spend_limit": limit})
                 return True
             except Exception as err:
                 print(err)
                 return False
 
-        return set(transaction)
+        return set_limit(transaction, limit)
 
-    def get_month_limit(self, month=None):
+    def get_month_limit(self) -> str:
         """
         Get spend limit for certain month, if not month passed then for current month
         """
@@ -137,14 +133,13 @@ class FirestoreAdapter:
         transaction = self.db.transaction()
 
         @firestore.transactional
-        def set(trans, month: str | None) -> bool:
+        def get_limit(trans) -> bool:
             try:
-                month = get_month_today() if not month else month
-                month_database = self.db.collection("months").document(month)
-                limits = month_database.get(transaction=trans).to_dict().get("month_spend_limits")
-                return limits
+                settings_database = self.db.collection("settings").document("month_spend_limit")
+                limit = settings_database.get().to_dict().get("month_spend_limit")
+                return limit
             except Exception as err:
                 print(err)
                 return False
 
-        return set(transaction, month)
+        return get_limit(transaction)
