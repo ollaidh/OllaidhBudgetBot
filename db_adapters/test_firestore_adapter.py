@@ -4,10 +4,10 @@ import threading
 
 from db_adapters.firestore_adapter import FirestoreAdapter
 from db_adapters.adapter import PurchaseInfo
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 
-def test_setUp() -> None:
+def test_set_up() -> None:
     emulator_host = os.getenv("FIRESTORE_EMULATOR_HOST")
     assert emulator_host is not None
     project_id = os.getenv("BUDBOT_PROJECT_ID")
@@ -19,7 +19,7 @@ def test_setUp() -> None:
 
 @patch("db_adapters.firestore_adapter.get_month_today")
 @patch("db_adapters.firestore_adapter.get_date_today")
-def test_add_purchase(date_mock, month_mock):
+def test_add_purchase(date_mock: MagicMock, month_mock: MagicMock) -> None:
     adapter = FirestoreAdapter()
 
     month_mock.return_value = "2022-10"
@@ -61,7 +61,7 @@ def test_add_purchase(date_mock, month_mock):
 
 @patch("db_adapters.firestore_adapter.get_month_today")
 @patch("db_adapters.firestore_adapter.get_date_today")
-def test_add_purchase_race_condition(date_mock, month_mock):
+def test_add_purchase_race_condition(date_mock: MagicMock, month_mock: MagicMock) -> None:
     barrier = threading.Barrier(3)
     adapter = FirestoreAdapter(sleep_wait_ms=1000)
 
@@ -111,18 +111,18 @@ def test_add_purchase_race_condition(date_mock, month_mock):
 
 
 @patch("db_adapters.firestore_adapter.get_month_today")
-def test_spent(date_mock):
+def test_spent(month_mock: MagicMock) -> None:
     adapter = FirestoreAdapter()
-    date_mock.return_value = "2023-01"
+    month_mock.return_value = "2023-01"
     adapter.add_purchase(PurchaseInfo("proplan", 20, "dog"))
-    date_mock.return_value = "2023-01"
+    month_mock.return_value = "2023-01"
     adapter.add_purchase(PurchaseInfo("baguette", 1.5, "bread"))
     adapter.add_purchase(PurchaseInfo("muffin", 2, "takeaway"))
-    date_mock.return_value = "2023-02"
+    month_mock.return_value = "2023-02"
     adapter.add_purchase(PurchaseInfo("pizza", 12.5, "takeaway"))
 
     spent_result = adapter.calculate_spent("2023-01", "2023-02", "takeaway")
-    assert isinstance(spent_result, dict) is True
+    assert isinstance(spent_result, dict)
     assert list(spent_result.items()) == [
         ("TAKEAWAY", 14.5),
         ("pizza", 12.5),
@@ -133,7 +133,7 @@ def test_spent(date_mock):
     assert spent_result == {"$all": 23.5}
 
     spent_result = adapter.calculate_spent("2023-01", "2023-02", "$each")
-    assert isinstance(spent_result, dict) is True
+    assert isinstance(spent_result, dict)
     assert [("TOTAL", 36.0), ("dog", 20), ("takeaway", 14.5), ("bread", 1.5)] == list(spent_result.items())
 
     spent_result = adapter.calculate_spent("2028-01", "2029-02", "")
@@ -150,9 +150,9 @@ def test_spent(date_mock):
 
 
 @patch("db_adapters.firestore_adapter.get_month_today")
-def test_set_month_limit(date_mock):
+def test_set_month_limit(month_mock: MagicMock) -> None:
     adapter = FirestoreAdapter()
-    date_mock.return_value = "2025-03"
+    month_mock.return_value = "2025-03"
 
     adapter.add_purchase(PurchaseInfo("zoloft", 20, "kukuha"))
     adapter.add_purchase(PurchaseInfo("magnesium", 20, "health"))
