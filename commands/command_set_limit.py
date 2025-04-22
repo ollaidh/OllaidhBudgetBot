@@ -19,11 +19,7 @@ class SetMonthSpendLimitCommandExecutor(CommandExecutor):
     def execute(self, database_adapter, user_input: list[str]) -> dict[str, str]:
         month_spend_limit = self.validate(user_input)
         comment = self.jibjab.month_limit_kind_warning(month_spend_limit) if month_spend_limit < 1500 else None
-        added_month_limit, limits = database_adapter.set_month_limit(month_spend_limit)
-        if len(limits) > 1 and limits[-1] != limits[-2]:
-            return {"message": f"MONTH SPENT LIMIT UPDATED: from {limits[-2]} to {month_spend_limit} EUR. \n{comment}"}
-        if len(limits) > 1:
-            return {"message": f"MONTH SPENT LIMIT remains the same: {month_spend_limit} EUR."}
+        added_month_limit = database_adapter.set_month_limit(month_spend_limit)
         if added_month_limit:
             return {"message": f"MONTH SPENT LIMIT SET: {month_spend_limit} EUR\n{comment}"}
         raise FailedAccessDatabaseException("set month spend limit")
