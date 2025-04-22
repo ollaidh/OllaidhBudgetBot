@@ -105,7 +105,7 @@ class FirestoreAdapter:
         except:
             return None
 
-    def set_month_limit(self, limit):
+    def set_month_limit(self, limit) -> bool:
         """
         Set how much money you wish to spend during current month - for burndown tracking.
         If month spend limit already set, new value will overwrite it
@@ -117,17 +117,19 @@ class FirestoreAdapter:
         def set(trans) -> bool:
             try:
                 month_database = self.db.collection("months").document(get_month_today())
-                limits = month_database.get(transaction=trans).to_dict()["month_spend_limits"]
-                if limits is not None and limit != limits[-1]:
+                limits = month_database.get(transaction=trans).to_dict().get("month_spend_limits")
+                if limits is None:
+                    trans.set(month_database, {"month_spend_limits": [limit]})
+                elif limit != limits[-1]:
                     trans.set(month_database, {"month_spend_limits": limits.append(limit)})
-                return True, limits
+                return True
             except Exception as err:
                 print(err)
                 return False
 
         return set(transaction)
 
-    def get_month_limit(self, month: str | None):
+    def get_month_limit(self, month=None):
         """
         Get spend limit for certain month, if not month passed then for current month
         """
@@ -135,14 +137,14 @@ class FirestoreAdapter:
         transaction = self.db.transaction()
 
         @firestore.transactional
-        def set(trans) -> bool:
+        def set(trans, month: str | None) -> bool:
             try:
                 month = get_month_today() if not month else month
                 month_database = self.db.collection("months").document(month)
-                limits = month_database.get(transaction=trans).to_dict()["month_spend_limits"]
+                limits = month_database.get(transaction=trans).to_dict().get("month_spend_limits")
                 return limits
             except Exception as err:
                 print(err)
                 return False
 
-        return set(transaction)
+        return set(transaction, month)

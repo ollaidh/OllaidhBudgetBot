@@ -1,4 +1,5 @@
 import os
+import pytest
 import requests
 import threading
 
@@ -7,13 +8,15 @@ from db_adapters.adapter import PurchaseInfo
 from unittest.mock import patch, MagicMock
 
 
-def test_set_up() -> None:
+@pytest.fixture(autouse=True)
+def clean_firestore() -> None:
+    """Clean FS DB before doing anything"""
     emulator_host = os.getenv("FIRESTORE_EMULATOR_HOST")
     assert emulator_host is not None
     project_id = os.getenv("BUDBOT_PROJECT_ID")
     assert project_id is not None
     url = f"http://{emulator_host}/emulator/v1/projects/{project_id}/databases/(default)/documents"
-    response = requests.delete(url)
+    response = requests.delete(url)  # here
     assert response.status_code == 200
 
 
@@ -158,5 +161,13 @@ def test_set_month_limit(month_mock: MagicMock) -> None:
     adapter.add_purchase(PurchaseInfo("magnesium", 20, "health"))
     adapter.add_purchase(PurchaseInfo("wine", 20, "alcohol"))
 
-    result = adapter.set_month_limit(2000)
-    assert result is True
+    limit_is_set = adapter.set_month_limit("2000")
+    assert limit_is_set is True
+    limits = adapter.get_month_limit()
+    assert limits == ["2000"]
+
+    adapter.set_month_limit("2100")
+    adapter.set_month_limit("2500")
+    adapter.set_month_limit("3000")
+    limits = adapter.get_month_limit()
+    assert limits == ["2000", "2100", "2500", "3000"]
