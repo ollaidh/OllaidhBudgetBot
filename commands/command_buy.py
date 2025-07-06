@@ -1,13 +1,13 @@
 from commands.exceptions import *
 from commands.command_executor import CommandExecutor
 from jibberjabber import JibberJabber
-from db_adapters.adapter import PurchaseInfo
+from db_adapters.adapter import Adapter, PurchaseInfo
 
 
 def get_category(item: str) -> str:
     categories = {
         "meat": ("steak", "pork", "chicken", "liver", "bacon", "meat"),
-        "takeaway": ("coffee", "pasrty", "breakfast", "lunch", "dinner", "takeaway"),
+        "takeaway": ("coffee", "pastry", "breakfast", "lunch", "dinner", "takeaway"),
         "utilities": ("electricity", "water", "internet"),
         "sweets": ("cookies", "chocolate", "sweets"),
         "vegetables": ("potatoes", "green", "avocado", "vegetables"),
@@ -37,7 +37,7 @@ class BuyCommandExecutor(CommandExecutor):
         except ValueError:
             raise NotNumberPriceException
 
-    def execute(self, database_adapter, user_input: list[str]) -> dict:
+    def execute(self, database_adapter: Adapter, user_input: list[str]) -> dict:
         parameters = self.validate(user_input)
         buy = database_adapter.add_purchase(PurchaseInfo(parameters.name, parameters.price, parameters.category))
         purchase = f"{parameters.name} {parameters.price} {parameters.category}"
