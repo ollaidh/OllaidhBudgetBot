@@ -24,7 +24,11 @@ async def on_message(message):
         return
 
     try:
+        print(f"Received message: {message.content}")
         msg_back = handler.handle_message(message.content)
+        if not msg_back:
+            return
+
         if "message" in msg_back:
             await message.channel.send(msg_back["message"])
         if "chart_path" in msg_back:
