@@ -14,12 +14,27 @@ assert bot_token
 
 
 @client.event
-async def on_ready():
-    print(f"We have logged in as {client.user}")
+async def on_connect() -> None:
+    print(f"Bot connected")
 
 
 @client.event
-async def on_message(message):
+async def on_ready() -> None:
+    print(f"We have logged in as {client.user=}")
+
+
+@client.event
+async def on_resumed() -> None:
+    print(f"Resumed session as {client.user=}")
+
+
+@client.event
+async def on_disconnect() -> None:
+    print(f"Bot disconnected")
+
+
+@client.event
+async def on_message(message: discord.Message) -> None:
     if message.author == client.user:
         return
 
@@ -36,8 +51,7 @@ async def on_message(message):
             file = discord.File(msg_back["chart_path"], "pie.png")
             await message.channel.send(file=file)
     except commands.BotException as err:
-        msg_back = str(err)
-        await message.channel.send(msg_back)
+        await message.channel.send(str(err))
 
 
 client.run(bot_token)
