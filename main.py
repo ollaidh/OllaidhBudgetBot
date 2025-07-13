@@ -1,3 +1,4 @@
+from bot_ping import ping_bot_endpoint
 import discord
 import os
 import commands
@@ -12,6 +13,8 @@ handler = commands_handler.CommandsHandler(adapter)
 bot_token = os.getenv("DISCORD_BOT_TOKEN")
 assert bot_token
 
+bot_url = os.getenv("BOT_URL")
+assert bot_url
 
 @client.event
 async def on_connect() -> None:
@@ -41,6 +44,7 @@ async def on_message(message: discord.Message) -> None:
     try:
         print(f"Received message: {message.content}")
         msg_back = handler.handle_message(message.content)
+        await ping_bot_endpoint(bot_url)  # ping bot to prevent it from falling asleep
         if not msg_back:
             return
 

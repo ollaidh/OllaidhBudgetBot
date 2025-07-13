@@ -11,12 +11,13 @@ class AppYaml:
 
         with open(self.path, "w") as file:
             lines = [
-                "runtime: python310",
+                "runtime: python311",
                 "",
                 "env_variables:",
                 f'   DISCORD_BOT_TOKEN: "{self.token}"',
                 f'   BUDBOT_PROJECT_ID: "{os.getenv("BUDBOT_PROJECT_ID")}"',
                 f'   GOOGLE_APPLICATION_CREDENTIALS: "{os.getenv("GOOGLE_APPLICATION_CREDENTIALS")}"',
+                f'   BOT_URL: "{os.getenv("BOT_URL")}"',
                 "",
                 "automatic_scaling:",
                 "  max_instances: 1",
