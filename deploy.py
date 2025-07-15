@@ -20,6 +20,7 @@ class AppYaml:
                 f'   BOT_URL: "{os.getenv("BOT_URL")}"',
                 "",
                 "automatic_scaling:",
+                "  min_instances: 0",
                 "  max_instances: 1",
                 "",
                 "",

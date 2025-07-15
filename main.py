@@ -1,14 +1,18 @@
-from bot_ping import ping_bot_endpoint
+# from bot_ping import ping_bot_endpoint
 import discord
 import os
 import commands
 import commands_handler
 from db_adapters.firestore_adapter import FirestoreAdapter
 
+
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 adapter = FirestoreAdapter()
 handler = commands_handler.CommandsHandler(adapter)
+purchase_categories = adapter.get_purchase_categories()
+
+print(purchase_categories)
 
 bot_token = os.getenv("DISCORD_BOT_TOKEN")
 assert bot_token
@@ -44,7 +48,7 @@ async def on_message(message: discord.Message) -> None:
     try:
         print(f"Received message: {message.content}")
         msg_back = handler.handle_message(message.content)
-        await ping_bot_endpoint(bot_url)  # ping bot to prevent it from falling asleep
+        # await ping_bot_endpoint(bot_url)  # ping bot to prevent it from falling asleep
         if not msg_back:
             return
 

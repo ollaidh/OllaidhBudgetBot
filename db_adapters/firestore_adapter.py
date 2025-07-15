@@ -143,3 +143,26 @@ class FirestoreAdapter:
                 return False
 
         return get_limit(transaction)
+    
+    def get_purchase_categories(self) -> dict:
+        """
+            Get set of categories, automatically assigned to some purchases
+        """
+
+        transaction = self.db.transaction()
+
+        @firestore.transactional
+        def get_purchase_categories(trans) -> dict:
+            try:
+                result = {}
+
+                for category in self.db.collection("categories_purchases"):
+                    items = category.get().to_dict()
+                    for item in items:
+                        result[item] = category
+                return result
+            except Exception as err:
+                print(err)
+                return {}
+            
+        return get_purchase_categories(transaction)
