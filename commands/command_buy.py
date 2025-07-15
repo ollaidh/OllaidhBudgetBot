@@ -39,6 +39,10 @@ class BuyCommandExecutor(CommandExecutor):
 
     def execute(self, database_adapter: Adapter, user_input: list[str]) -> dict:
         parameters = self.validate(user_input)
+
+        if parameters.category.startswith("test"):
+            return {"message": f"TEST PURCHASE {parameters.category} {parameters.price}. Not added to budget."}
+
         buy = database_adapter.add_purchase(PurchaseInfo(parameters.name, parameters.price, parameters.category))
         purchase = f"{parameters.name} {parameters.price} {parameters.category}"
         comment = self.jibjab.toxic_response(parameters.name, parameters.category)
