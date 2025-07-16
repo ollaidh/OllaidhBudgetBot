@@ -168,3 +168,46 @@ def test_set_month_limit(month_mock: MagicMock) -> None:
     adapter.set_month_limit("3000")
     limit = adapter.get_month_limit()
     assert limit == "3000"
+
+
+def test_get_purchase_category() -> None:
+    adapter = FirestoreAdapter()
+
+    adapter.db.collection("purchases_categories").document("takeaway").set({"items": ["coffee", "breakfast", "dinner", "takeaway"]}, merge=True)
+    adapter.db.collection("purchases_categories").document("utilities").set({"items": ["water", "electricity", "internet", "phone"]}, merge=True)
+
+    categories = adapter.db.collection("purchases_categories").get()
+
+    categories = {category.id: category._data for category in categories}
+
+    assert len(categories) == 2
+    assert "takeaway" in categories
+    assert "utilities" in categories
+
+    takeaway = categories["takeaway"]["items"]
+    assert len(takeaway) == 4
+    for item in takeaway:
+        assert item in ["coffee", "breakfast", "dinner", "takeaway"]
+
+    utilities = categories["utilities"]["items"]
+    assert len(utilities) == 4
+    for item in utilities:
+        assert item in ["water", "electricity", "internet", "phone"]
+    
+    # category.update({"items": ["coffee", "breakfast", "dinner", "takeaway"]})
+
+    categories = adapter.get_purchase_categories()
+
+    assert len(categories) == 8
+
+    assert categories['coffee'] == "takeaway"
+    assert categories['breakfast'] == "takeaway"
+    assert categories['dinner'] == "takeaway"
+    assert categories['takeaway'] == "takeaway"
+    assert categories['water'] == "utilities"
+    assert categories['electricity'] == "utilities"
+    assert categories['internet'] == "utilities"
+    assert categories['phone'] == "utilities"
+
+
+
