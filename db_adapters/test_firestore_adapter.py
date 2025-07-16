@@ -173,8 +173,11 @@ def test_set_month_limit(month_mock: MagicMock) -> None:
 def test_get_purchase_category() -> None:
     adapter = FirestoreAdapter()
 
-    adapter.db.collection("purchases_categories").document("takeaway").set({"items": ["coffee", "breakfast", "dinner", "takeaway"]}, merge=True)
-    adapter.db.collection("purchases_categories").document("utilities").set({"items": ["water", "electricity", "internet", "phone"]}, merge=True)
+    data = {"items": ["coffee", "breakfast", "dinner", "takeaway"]}
+    adapter.db.collection("purchases_categories").document("takeaway").set(data, merge=True)
+
+    data = {"items": ["water", "electricity", "internet", "phone"]}
+    adapter.db.collection("purchases_categories").document("utilities").set(data, merge=True)
 
     categories = adapter.db.collection("purchases_categories").get()
 
