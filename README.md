@@ -103,6 +103,33 @@ launch.json for pytest example:
 }
 ```
 
+
+## Run tests locally with Docker
+
+Prerequisites:
+
+Firestore emulator. Recommended way to run - in Docker:
+
+Pull image:
+
+```
+docker pull google/cloud-sdk:emulators
+```
+
+Check that installation was successful:
+
+```
+docker run --rm --platform=linux/amd64 google/cloud-sdk:emulators gcloud version
+```
+
+Run emulators on port 8080:
+
+```
+docker run --rm -p 8090:8090 --platform=linux/amd64 google/cloud-sdk:emulators gcloud beta emulators firestore start --host-port=0.0.0.0:8090
+```
+
+
+
 ## Deploy
 
 Use `deploy.py` script for deploying bot to your Discord.
