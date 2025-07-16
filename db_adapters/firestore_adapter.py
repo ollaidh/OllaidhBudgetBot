@@ -23,6 +23,7 @@ class FirestoreAdapter:
         project_id = os.getenv("BUDBOT_PROJECT_ID")
         self.db = Client(project=project_id)
         self.sleep_wait_ms = sleep_wait_ms  # used for race condition tests, = 0 in production
+        self.purchase_categories = self.get_purchase_categories()
 
     def add_purchase(self, purchase: PurchaseInfo) -> bool:
         transaction = self.db.transaction()
@@ -144,6 +145,23 @@ class FirestoreAdapter:
 
         return get_limit(transaction)
     
+    # def set_purchase_category(self, purchase, category) -> bool:
+    #     transaction = self.db.transaction()
+
+    #     @firestore.transactional
+    #     def set_category(trans, purchase, category) -> bool:
+    #         try:
+    #             categories = self.db.collection("categories_purchases")
+    #             if categories.document(category).get():
+    #                 purchases = categories.document(category).get().to_dict().get("purchase")
+                
+    #             return True
+    #         except Exception as err:
+    #             print(err)
+    #             return False
+
+    #     return set_category(transaction, purchase, category)
+    
     def get_purchase_categories(self) -> dict:
         """
             Get set of categories, automatically assigned to some purchases
@@ -152,17 +170,19 @@ class FirestoreAdapter:
         transaction = self.db.transaction()
 
         @firestore.transactional
-        def get_purchase_categories(trans) -> dict:
+        def get_categories(trans) -> dict:
             try:
                 result = {}
 
-                for category in self.db.collection("categories_purchases"):
-                    items = category.get().to_dict()
-                    for item in items:
-                        result[item] = category
+                categories = self.db.collection("purchases_categories").get()
+
+
+                for category in categories:
+                    for item in category._data["items"]:
+                        result[item] = category.id
                 return result
             except Exception as err:
                 print(err)
                 return {}
             
-        return get_purchase_categories(transaction)
+        return get_categories(transaction)
