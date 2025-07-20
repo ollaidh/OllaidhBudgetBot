@@ -1,7 +1,9 @@
 .idea
 .vscode
-__pycache__
+**/__pycache__
 venv
 .venv
 app.yaml
 cred-*.json
+**/.mypy_cache
+**/.pytest_cache
