@@ -144,27 +144,10 @@ class FirestoreAdapter:
                 return False
 
         return get_limit(transaction)
-    
-    # def set_purchase_category(self, purchase, category) -> bool:
-    #     transaction = self.db.transaction()
 
-    #     @firestore.transactional
-    #     def set_category(trans, purchase, category) -> bool:
-    #         try:
-    #             categories = self.db.collection("categories_purchases")
-    #             if categories.document(category).get():
-    #                 purchases = categories.document(category).get().to_dict().get("purchase")
-                
-    #             return True
-    #         except Exception as err:
-    #             print(err)
-    #             return False
-
-    #     return set_category(transaction, purchase, category)
-    
     def get_purchase_categories(self) -> dict:
         """
-            Get set of categories, automatically assigned to some purchases
+        Get set of categories, automatically assigned to some purchases
         """
 
         transaction = self.db.transaction()
@@ -176,7 +159,6 @@ class FirestoreAdapter:
 
                 categories = self.db.collection("purchases_categories").get()
 
-
                 for category in categories:
                     for item in category._data["items"]:
                         result[item] = category.id
@@ -184,5 +166,33 @@ class FirestoreAdapter:
             except Exception as err:
                 print(err)
                 return {}
-            
+
         return get_categories(transaction)
+
+    def set_purchase_category(self, category: str, purchases: list[str]) -> bool:
+        """
+        Set new purchase to the category
+        """
+
+        transaction = self.db.transaction()
+
+        @firestore.transactional
+        def set_purchase(trans, category, purchases) -> bool:
+            try:
+                # check if purchase already exists in one of categories and remove if previously existed:
+                for purchase in purchases:
+                    if purchase in self.purchase_categories:
+                        category_document = self.db.collection("purchases_categories").document(category)
+                        category_document.update({"items": firestore.ArrayRemove([purchase])})
+
+                category_document = self.db.collection("purchases_categories").document(category)
+                if category_document.get().exists:
+                    category_document.update({"items": firestore.ArrayUnion(purchases)})  # update existing category
+                else:
+                    category_document.set({"items": purchases})  # start new category
+                return True
+            except Exception as err:
+                print(err)
+                return False
+
+        return set_purchase(transaction, category, purchases)
