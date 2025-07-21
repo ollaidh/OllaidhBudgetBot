@@ -196,21 +196,36 @@ def test_get_purchase_category() -> None:
     assert len(utilities) == 4
     for item in utilities:
         assert item in ["water", "electricity", "internet", "phone"]
-    
+
     # category.update({"items": ["coffee", "breakfast", "dinner", "takeaway"]})
 
     categories = adapter.get_purchase_categories()
 
     assert len(categories) == 8
 
-    assert categories['coffee'] == "takeaway"
-    assert categories['breakfast'] == "takeaway"
-    assert categories['dinner'] == "takeaway"
-    assert categories['takeaway'] == "takeaway"
-    assert categories['water'] == "utilities"
-    assert categories['electricity'] == "utilities"
-    assert categories['internet'] == "utilities"
-    assert categories['phone'] == "utilities"
+    assert categories["coffee"] == "takeaway"
+    assert categories["breakfast"] == "takeaway"
+    assert categories["dinner"] == "takeaway"
+    assert categories["takeaway"] == "takeaway"
+    assert categories["water"] == "utilities"
+    assert categories["electricity"] == "utilities"
+    assert categories["internet"] == "utilities"
+    assert categories["phone"] == "utilities"
 
 
+def test_set_purchase_category() -> None:
+    adapter = FirestoreAdapter()
 
+    adapter.set_purchase_category("test_crap", ["one_crap", "two_crap"])
+
+    categories = adapter.db.collection("purchases_categories").get()
+
+    categories = {category.id: category._data for category in categories}
+
+    assert "test_crap" in categories
+    assert len(categories) == 1
+    items = categories["test_crap"]["items"]
+    assert len(items) == 2
+
+    for purchase in items:
+        assert purchase in ["one_crap", "two_crap"]
