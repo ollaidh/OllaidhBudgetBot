@@ -24,6 +24,7 @@ class FirestoreAdapter:
         self.db = Client(project=project_id)
         self.sleep_wait_ms = sleep_wait_ms  # used for race condition tests, = 0 in production
         self.purchase_categories = self.get_purchase_categories()
+        self.set_month_limit("2500")  # set default value
 
     def add_purchase(self, purchase: PurchaseInfo) -> bool:
         transaction = self.db.transaction()
@@ -53,6 +54,14 @@ class FirestoreAdapter:
                         "date": get_date_today(),
                     },
                 )
+
+                # update remaining budget
+                budget_remaining_doc = self.db.collection("settings").document("month_budget_remaining")
+                settings = budget_remaining_doc.get().to_dict()
+                curr_budget_remaining = settings["month_budget_remaining"]
+                settings["month_budget_remaining"] = float(curr_budget_remaining) - purchase.price
+                trans.set(budget_remaining_doc, settings)
+
                 return True
             except Exception as err:
                 print(err)
@@ -117,8 +126,24 @@ class FirestoreAdapter:
         @firestore.transactional
         def set_limit(trans, limit) -> bool:
             try:
-                settings_database = self.db.collection("settings").document("month_spend_limit")
-                trans.set(settings_database, {"month_spend_limit": limit})
+                spend_limit_doc = self.db.collection("settings").document("month_spend_limit")
+                curr_spend_limit = spend_limit_doc.get().to_dict()
+
+                budget_remaining_doc = self.db.collection("settings").document("month_budget_remaining")
+                curr_budget_remaining = budget_remaining_doc.get().to_dict()
+
+                if curr_budget_remaining and curr_spend_limit:
+                    curr_spent = int(curr_spend_limit.get("month_spend_limit")) - int(
+                        curr_budget_remaining.get("month_budget_remaining")
+                    )
+                else:
+                    curr_spent = 0
+
+                trans.set(spend_limit_doc, {"month_spend_limit": limit})
+
+                # set remaining
+                new_budget_remaining = str(int(limit) - int(curr_spent))
+                trans.set(budget_remaining_doc, {"month_budget_remaining": new_budget_remaining})
                 return True
             except Exception as err:
                 print(err)
@@ -144,6 +169,24 @@ class FirestoreAdapter:
                 return False
 
         return get_limit(transaction)
+
+    def get_remaining_budget(self) -> str:
+        """
+        Get how much is left to spend of the set budget for certain month
+        """
+        transaction = self.db.transaction()
+
+        @firestore.transactional
+        def get_remaining(trans) -> bool:
+            try:
+                settings_database = self.db.collection("settings").document("month_budget_remaining")
+                budget = settings_database.get().to_dict().get("month_budget_remaining")
+                return budget
+            except Exception as err:
+                print(err)
+                return False
+
+        return get_remaining(transaction)
 
     def get_purchase_categories(self) -> dict:
         """

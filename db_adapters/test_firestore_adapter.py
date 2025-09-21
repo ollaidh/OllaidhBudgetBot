@@ -152,22 +152,48 @@ def test_spent(month_mock: MagicMock) -> None:
     assert spent_result == {}
 
 
+@patch("db_adapters.firestore_adapter.get_date_today")
 @patch("db_adapters.firestore_adapter.get_month_today")
-def test_set_month_limit(month_mock: MagicMock) -> None:
+def test_set_month_limit(month_mock: MagicMock, date_mock: MagicMock) -> None:
     adapter = FirestoreAdapter()
     month_mock.return_value = "2025-03"
 
     limit = adapter.get_month_limit()
-    assert limit is False
+    assert limit == "2500"
 
-    limit_is_set = adapter.set_month_limit("2000")
+    remaining_budget = adapter.get_remaining_budget()
+    assert remaining_budget == "2500"
+
+    limit_is_set = adapter.set_month_limit("3000")
     assert limit_is_set is True
     limit = adapter.get_month_limit()
-    assert limit == "2000"
+    assert limit == "3000"
+    remaining_budget = adapter.get_remaining_budget()
+    assert remaining_budget == "3000"
 
-    adapter.set_month_limit("3000")
+    month_mock.return_value = "2022-10"
+    date_mock.return_value = "2022-10-04"
+    adapter.add_purchase(PurchaseInfo("gas", 80, "car"))
     limit = adapter.get_month_limit()
     assert limit == "3000"
+    remaining_budget = adapter.get_remaining_budget()
+    assert float(remaining_budget) == 2920
+
+    # check if after updating month limit
+    # remaining budget is updated accordingly
+    adapter.set_month_limit("4000")
+    remaining_budget = adapter.get_remaining_budget()
+    assert float(remaining_budget) == 3920
+
+    # buy some more
+    adapter.add_purchase(PurchaseInfo("gas", 7.5, "car"))
+    remaining_budget = adapter.get_remaining_budget()
+    assert float(remaining_budget) == 3912.5
+
+    # and a bit more to be sure
+    adapter.add_purchase(PurchaseInfo("gas", 7.2, "car"))
+    remaining_budget = adapter.get_remaining_budget()
+    assert float(remaining_budget) == 3905.3
 
 
 def test_get_purchase_category() -> None:
