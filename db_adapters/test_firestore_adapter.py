@@ -1,5 +1,9 @@
 import os
+import string
+import subprocess
+import time
 import pytest
+import random
 import requests
 import threading
 
@@ -9,15 +13,32 @@ from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture(autouse=True)
-def clean_firestore() -> None:
-    """Clean FS DB before doing anything"""
-    emulator_host = os.getenv("FIRESTORE_EMULATOR_HOST")
-    assert emulator_host is not None
-    project_id = os.getenv("BUDBOT_PROJECT_ID")
-    assert project_id is not None
-    url = f"http://{emulator_host}/emulator/v1/projects/{project_id}/databases/(default)/documents"
-    response = requests.delete(url)  # here
-    assert response.status_code == 200
+def setup_docker():
+    postfix = "".join(random.choices(string.ascii_letters, k=5))
+    container_name = f"cntr-{postfix}"
+    proc = subprocess.Popen(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "-p",
+            "8090:8090",
+            "--name",
+            container_name,
+            "--platform=linux/amd64",
+            "google/cloud-sdk:emulators",
+            "gcloud",
+            "beta",
+            "emulators",
+            "firestore",
+            "start",
+            "--host-port=0.0.0.0:8090",
+        ],
+    )
+
+    yield
+
+    subprocess.run(["docker", "stop", container_name])
 
 
 @patch("db_adapters.firestore_adapter.get_month_today")
