@@ -41,6 +41,7 @@ def setup_docker():
     subprocess.run(["docker", "stop", container_name])
 
 
+@pytest.mark.integration_test
 @patch("db_adapters.firestore_adapter.get_month_today")
 @patch("db_adapters.firestore_adapter.get_date_today")
 def test_add_purchase(date_mock: MagicMock, month_mock: MagicMock) -> None:
@@ -83,6 +84,7 @@ def test_add_purchase(date_mock: MagicMock, month_mock: MagicMock) -> None:
     }
 
 
+@pytest.mark.integration_test
 @patch("db_adapters.firestore_adapter.get_month_today")
 @patch("db_adapters.firestore_adapter.get_date_today")
 def test_add_purchase_race_condition(date_mock: MagicMock, month_mock: MagicMock) -> None:
@@ -134,6 +136,7 @@ def test_add_purchase_race_condition(date_mock: MagicMock, month_mock: MagicMock
     } == adapter.calculate_spent("2000-01", "2000-05", "$each")
 
 
+@pytest.mark.integration_test
 @patch("db_adapters.firestore_adapter.get_month_today")
 def test_spent(month_mock: MagicMock) -> None:
     adapter = FirestoreAdapter()
@@ -173,6 +176,7 @@ def test_spent(month_mock: MagicMock) -> None:
     assert spent_result == {}
 
 
+@pytest.mark.integration_test
 @patch("db_adapters.firestore_adapter.get_date_today")
 @patch("db_adapters.firestore_adapter.get_month_today")
 def test_set_month_limit(month_mock: MagicMock, date_mock: MagicMock) -> None:
@@ -217,6 +221,7 @@ def test_set_month_limit(month_mock: MagicMock, date_mock: MagicMock) -> None:
     assert float(remaining_budget) == 3905.3
 
 
+@pytest.mark.integration_test
 def test_get_purchase_category() -> None:
     adapter = FirestoreAdapter()
 
@@ -260,6 +265,7 @@ def test_get_purchase_category() -> None:
     assert categories["phone"] == "utilities"
 
 
+@pytest.mark.integration_test
 def test_set_purchase_category() -> None:
     adapter = FirestoreAdapter()
 
