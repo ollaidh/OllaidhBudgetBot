@@ -26,20 +26,20 @@ def test_handle_message():
     adapter.add_purchase = MagicMock(return_value=True)
 
     # *.startswith() is used to ignore random jibber jabber comments after th block ADDED PURCHASE
-    assert handler.handle_message("!buy\ncoffee\n3.5")["message"].startswith("ADDED PURCHASE: coffee 3.5") is True
-    assert handler.handle_message("!buy\ncoffee 3.5")["message"].startswith("ADDED PURCHASE: coffee 3.5") is True
-    assert handler.handle_message("!buy coffee 3.5")["message"].startswith("ADDED PURCHASE: coffee 3.5") is True
+    assert handler.handle_message("!buy\ncoffee\n3.5")["message"].startswith("ADDED PURCHASE: coffee 3.5")
+    assert handler.handle_message("!buy\ncoffee 3.5")["message"].startswith("ADDED PURCHASE: coffee 3.5")
+    assert handler.handle_message("!buy coffee 3.5")["message"].startswith("ADDED PURCHASE: coffee 3.5")
 
     with pytest.raises(InvalidCommandException) as ex:
         handler.handle_message("!purchased\ncoffee 3.5")
 
-        assert str(ex.exception).startswith("Invalid command") is True
+        assert str(ex.exception).startswith("Invalid command")
         assert ex.exception.command == "!purchased"
-        assert ("!help" in ex.exception.accepted_commands) is True
-        assert ("!buy" in ex.exception.accepted_commands) is True
-        assert ("!spent" in ex.exception.accepted_commands) is True
-        assert ("!del" in ex.exception.accepted_commands) is True
-        assert ("!version" in ex.exception.accepted_commands) is True
+        assert "!help" in ex.exception.accepted_commands
+        assert "!buy" in ex.exception.accepted_commands
+        assert "!spent" in ex.exception.accepted_commands
+        assert "!del" in ex.exception.accepted_commands
+        assert "!version" in ex.exception.accepted_commands
 
     with pytest.raises(InvalidParametersException):
         handler.handle_message("!spent\ncoffee 2012-01-01")
