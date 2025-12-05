@@ -1,29 +1,29 @@
-import unittest
+import pytest
 from commands.command_help import *
 
 
-class TestHelp(unittest.TestCase):
-    def test_validate_help_parameters(self):
-        self.assertTrue(validate_help_parameters([]))
-        self.assertTrue(validate_help_parameters(["buy"]))
-        self.assertFalse(validate_help_parameters(["info"]))
-        self.assertFalse(validate_help_parameters(["buy", "del"]))
-
-    def test_command_execute(self):
-        command = HelpCommandExecutor()
-        result = command.execute(None, [])
-        self.assertTrue(result["message"].startswith("Ollaidh BUDget BUDdy - track your budget"))
-
-        result = command.execute(None, ["buy"])
-        self.assertTrue(result["message"].startswith('"!buy"'))
-        result = command.execute(None, ["spent"])
-        self.assertTrue(result["message"].startswith('"!spent"'))
-        result = command.execute(None, ["del"])
-        self.assertTrue(result["message"].startswith('"!del"'))
-
-        self.assertRaises(InvalidParametersException, command.execute, None, ["buy", "spent"])
-        self.assertRaises(InvalidParametersException, command.execute, None, ["help"])
+def test_validate_help_parameters():
+    assert validate_help_parameters([])
+    assert validate_help_parameters(["buy"])
+    assert validate_help_parameters(["info"]) is False
+    assert validate_help_parameters(["buy", "del"]) is False
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.unit_test
+def test_command_execute():
+    command = HelpCommandExecutor()
+    result = command.execute(None, [])
+    assert result["message"].startswith("Ollaidh BUDget BUDdy - track your budget")
+
+    result = command.execute(None, ["buy"])
+    assert result["message"].startswith('"!buy"')
+    result = command.execute(None, ["spent"])
+    assert result["message"].startswith('"!spent"')
+    result = command.execute(None, ["del"])
+    assert result["message"].startswith('"!del"')
+
+    with pytest.raises(InvalidParametersException):
+        command.execute(None, ["buy", "spent"])
+
+    with pytest.raises(InvalidParametersException):
+        command.execute(None, ["help"])
