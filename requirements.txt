@@ -1,8 +1,9 @@
-pytest
-matplotlib
 discord
-requests
-types-requests
+flask
 freezegun
 google-cloud-firestore
-flask
+matplotlib
+pytest
+pytest-mock
+requests
+types-requests

@@ -5,8 +5,7 @@ from unittest.mock import patch
 
 
 @pytest.mark.unit_test
-@patch("commands.command_chart.piechart_maker")
-def test_command_execute(path_mock):
+def test_command_execute(mocker):
     command = ChartCommandExecutor()
 
     class TestAdapter:
@@ -16,7 +15,9 @@ def test_command_execute(path_mock):
 
     adapter.calculate_spent = MagicMock(return_value={"TOTAL": 100, "meat": 70, "takeaway": 30})
 
-    path_mock.return_value = r"C:\Users\razer\PycharmProjects\budget_bot\spent.png"
+    mock_obj = mocker.patch("commands.command_chart.piechart_maker")
+
+    mock_obj.return_value = r"C:\Users\razer\PycharmProjects\budget_bot\spent.png"
     assert command.execute(adapter, ["2022-12", "2023-02", "$each"]) == {
         "chart_path": r"C:\Users\razer\PycharmProjects\budget_bot\spent.png"
     }
